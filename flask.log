@@ -93,3 +93,426 @@ sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) NOT NULL constraint fail
 127.0.0.1 - - [10/Jun/2026 13:25:15] "[36mGET /auth/google/callback?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
 127.0.0.1 - - [10/Jun/2026 13:25:15] "[36mGET /auth/google/callback?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
 127.0.0.1 - - [10/Jun/2026 13:25:15] "GET /auth/google/callback?__debugger__=yes&cmd=resource&f=console.png&s=78B7yH6hZPo84hqse3Cz HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:35:06] "[35m[1mGET /auth/google/callback?state=z6dVdL99oOCg89MbdONaRCCo3QwuOf&iss=https://accounts.google.com&code=4/0AdkVLPzIV83nI-elzpc8rwJHB42QeP1FRlXwS0XKEQQXtt6zl06Qj0lY7NieEjT24SWXLA&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=2&prompt=consent HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/app.py", line 502, in google_callback
+    token = google.authorize_access_token()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/authlib/integrations/flask_client/apps.py", line 101, in authorize_access_token
+    token = self.fetch_access_token(**params, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/authlib/integrations/base_client/sync_app.py", line 342, in fetch_access_token
+    token = client.fetch_token(token_endpoint, **params)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/authlib/oauth2/client.py", line 211, in fetch_token
+    return self._fetch_token(
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/authlib/oauth2/client.py", line 368, in _fetch_token
+    return self.parse_response_token(resp)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/authlib/oauth2/client.py", line 344, in parse_response_token
+    raise self.oauth_error_class(
+authlib.integrations.base_client.errors.OAuthError: invalid_grant: Bad Request
+127.0.0.1 - - [10/Jun/2026 13:35:06] "GET /auth/google/callback?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:35:06] "GET /auth/google/callback?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:35:06] "GET /auth/google/callback?__debugger__=yes&cmd=resource&f=console.png&s=78B7yH6hZPo84hqse3Cz HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:35:06] "GET /auth/google/callback?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:35:10] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:35:10] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+127.0.0.1 - - [10/Jun/2026 13:35:12] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:35:13] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+127.0.0.1 - - [10/Jun/2026 13:35:14] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:35:14] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:35:14] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:35:15] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:35:15] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+127.0.0.1 - - [10/Jun/2026 13:35:19] "[32mGET / HTTP/1.1[0m" 302 -
+127.0.0.1 - - [10/Jun/2026 13:35:19] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:35:22] "[32mGET /auth/google HTTP/1.1[0m" 302 -
+127.0.0.1 - - [10/Jun/2026 13:35:26] "[35m[1mGET /auth/google/callback?state=NrS56KDXkXROhoHfQvuSMtS6R1X81x&iss=https://accounts.google.com&code=4/0AdkVLPwL-KXDgClSH9cr0HT9Yk2-RU77OfXmr1ZiH6B0V_tYnUQolN_4xGttRdu3g8Qqhw&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+openid+https://www.googleapis.com/auth/userinfo.email&authuser=2&prompt=none HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.IntegrityError: NOT NULL constraint failed: user.password_hash
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/app.py", line 520, in google_callback
+    db.session.flush()
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/orm/scoping.py", line 924, in flush
+    return self._proxied.flush(objects=objects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4352, in flush
+    self._flush(objects)
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4487, in _flush
+    with util.safe_reraise():
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 122, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4448, in _flush
+    flush_context.execute()
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 465, in execute
+    rec.execute(self)
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 641, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 94, in save_obj
+    _emit_insert_statements(
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 1234, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1421, in execute
+    return meth(
+           ^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 526, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1643, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2365, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) NOT NULL constraint failed: user.password_hash
+[SQL: INSERT INTO user (name, email, password_hash, google_id, created_at) VALUES (?, ?, ?, ?, ?)]
+[parameters: ('ethan', 'legendxsn@gmail.com', None, '102704378922745963880', '2026-06-10 13:35:26.546287')]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+127.0.0.1 - - [10/Jun/2026 13:35:26] "[36mGET /auth/google/callback?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 13:35:26] "[36mGET /auth/google/callback?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 13:35:26] "[36mGET /auth/google/callback?__debugger__=yes&cmd=resource&f=console.png&s=78B7yH6hZPo84hqse3Cz HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 13:35:53] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:35:55] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:35:56] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:35:58] "[32mGET /auth/google HTTP/1.1[0m" 302 -
+127.0.0.1 - - [10/Jun/2026 13:36:06] "[32mGET /auth/google/callback?state=1W2CliHmdwNB0qWGd2YlrMFk1PvWTj&iss=https://accounts.google.com&code=4/0AdkVLPyRxqNUXRTZS5Ml8EuIuhKRKWFF-aIw_3FznHgJLc8-87pgpc88F6B6tGucDbb0Hw&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=0&prompt=consent HTTP/1.1[0m" 302 -
+127.0.0.1 - - [10/Jun/2026 13:36:06] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:36:06] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 13:36:06] "[36mGET /static/js/ui.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 13:36:06] "[36mGET /static/js/charts.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 13:36:06] "[36mGET /static/js/dashboard.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 13:36:06] "[36mGET /static/js/transactions.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 13:36:06] "[36mGET /static/js/app.js HTTP/1.1[0m" 304 -
+/home/nazeer/WealthSync/app.py:133: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  return User.query.get(uid) if uid else None
+127.0.0.1 - - [10/Jun/2026 13:36:06] "GET /api/auth/me HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:36:06] "GET /api/profile HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:36:06] "GET /api/transactions HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:36:06] "GET /api/budgets HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:36:06] "GET /api/goals HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:36:06] "GET /api/investments HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:36:09] "POST /api/auth/logout HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:36:09] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 13:36:12] "[32mGET /auth/google HTTP/1.1[0m" 302 -
+127.0.0.1 - - [10/Jun/2026 13:36:17] "[35m[1mGET /auth/google/callback?state=XeqKDvQLue6dZR4qyIRg3ZDhOyWMrf&iss=https://accounts.google.com&code=4/0AdkVLPycMBF5nQ0NN7zFwlq_UdpBXGgE4nD7d-DzBxCZW6HHCH91vj6Cl84OlnOTs1woWQ&scope=email+profile+https://www.googleapis.com/auth/userinfo.email+openid+https://www.googleapis.com/auth/userinfo.profile&authuser=2&prompt=none HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.IntegrityError: NOT NULL constraint failed: user.password_hash
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/app.py", line 520, in google_callback
+    db.session.flush()
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/orm/scoping.py", line 924, in flush
+    return self._proxied.flush(objects=objects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4352, in flush
+    self._flush(objects)
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4487, in _flush
+    with util.safe_reraise():
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py", line 122, in __exit__
+    raise exc_value.with_traceback(exc_tb)
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 4448, in _flush
+    flush_context.execute()
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 465, in execute
+    rec.execute(self)
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/orm/unitofwork.py", line 641, in execute
+    util.preloaded.orm_persistence.save_obj(
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 94, in save_obj
+    _emit_insert_statements(
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/orm/persistence.py", line 1234, in _emit_insert_statements
+    result = connection.execute(
+             ^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1421, in execute
+    return meth(
+           ^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 526, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1643, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2365, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) NOT NULL constraint failed: user.password_hash
+[SQL: INSERT INTO user (name, email, password_hash, google_id, created_at) VALUES (?, ?, ?, ?, ?)]
+[parameters: ('ethan', 'legendxsn@gmail.com', None, '102704378922745963880', '2026-06-10 13:36:17.395365')]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+127.0.0.1 - - [10/Jun/2026 13:36:17] "[36mGET /auth/google/callback?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 13:36:17] "[36mGET /auth/google/callback?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 13:36:17] "[36mGET /auth/google/callback?__debugger__=yes&cmd=resource&f=console.png&s=78B7yH6hZPo84hqse3Cz HTTP/1.1[0m" 304 -
+ * Detected change in '/home/nazeer/WealthSync/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 420-456-749
+ * Detected change in '/home/nazeer/WealthSync/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 420-456-749
+127.0.0.1 - - [10/Jun/2026 14:47:13] "[35m[1mGET /auth/google/callback?state=XeqKDvQLue6dZR4qyIRg3ZDhOyWMrf&iss=https://accounts.google.com&code=4/0AdkVLPycMBF5nQ0NN7zFwlq_UdpBXGgE4nD7d-DzBxCZW6HHCH91vj6Cl84OlnOTs1woWQ&scope=email+profile+https://www.googleapis.com/auth/userinfo.email+openid+https://www.googleapis.com/auth/userinfo.profile&authuser=2&prompt=none HTTP/1.1[0m" 500 -
+Traceback (most recent call last):
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/app.py", line 502, in google_callback
+    token = google.authorize_access_token()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/authlib/integrations/flask_client/apps.py", line 101, in authorize_access_token
+    token = self.fetch_access_token(**params, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/authlib/integrations/base_client/sync_app.py", line 342, in fetch_access_token
+    token = client.fetch_token(token_endpoint, **params)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/authlib/oauth2/client.py", line 211, in fetch_token
+    return self._fetch_token(
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/authlib/oauth2/client.py", line 368, in _fetch_token
+    return self.parse_response_token(resp)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nazeer/WealthSync/venv/lib/python3.12/site-packages/authlib/oauth2/client.py", line 344, in parse_response_token
+    raise self.oauth_error_class(
+authlib.integrations.base_client.errors.OAuthError: invalid_grant: Bad Request
+127.0.0.1 - - [10/Jun/2026 14:47:14] "GET /auth/google/callback?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:47:14] "GET /auth/google/callback?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:47:14] "GET /auth/google/callback?__debugger__=yes&cmd=resource&f=console.png&s=pAq6RblQOUt7tp39nblX HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:47:14] "GET /auth/google/callback?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:47:15] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:47:15] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+127.0.0.1 - - [10/Jun/2026 14:47:16] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:47:17] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:47:17] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:47:17] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:47:18] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+127.0.0.1 - - [10/Jun/2026 14:47:21] "[32mGET /auth/google HTTP/1.1[0m" 302 -
+127.0.0.1 - - [10/Jun/2026 14:47:28] "[32mGET /auth/google/callback?state=CG5BfqoV1gsmqRjhhHqgi6hFsOH3vz&iss=https://accounts.google.com&code=4/0AdkVLPzAFKRZNl8AMP4fw77PnLBhrRVSJgk7gS23Fhhx7bBBvRuZhMibb3X00R6B3FF00A&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=3&prompt=consent HTTP/1.1[0m" 302 -
+127.0.0.1 - - [10/Jun/2026 14:47:28] "GET /onboarding HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:48:31] "PUT /api/profile HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:48:33] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:48:33] "[36mGET /static/js/ui.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:48:33] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:48:33] "[36mGET /static/js/dashboard.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:48:33] "[36mGET /static/js/transactions.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:48:33] "[36mGET /static/js/app.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:48:33] "[36mGET /static/js/charts.js HTTP/1.1[0m" 304 -
+/home/nazeer/WealthSync/app.py:133: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  return User.query.get(uid) if uid else None
+127.0.0.1 - - [10/Jun/2026 14:48:33] "GET /api/auth/me HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:48:33] "GET /api/profile HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:48:33] "GET /api/budgets HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:48:33] "GET /api/transactions HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:48:33] "GET /api/goals HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:48:33] "GET /api/investments HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:15] "POST /api/auth/logout HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:15] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:17] "[32mGET /auth/google HTTP/1.1[0m" 302 -
+127.0.0.1 - - [10/Jun/2026 14:49:21] "[32mGET /auth/google/callback?state=FvwePJZJx0qlyU4u0WxArRHbR9rvMa&iss=https://accounts.google.com&code=4/0AdkVLPw1shLKvsBkMFL8RSAZ2Xi3AG-q1Ef7Fn0zpnTQz3vp59xQAwe1epnnxoh2ws1f0A&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email+openid&authuser=3&prompt=none HTTP/1.1[0m" 302 -
+127.0.0.1 - - [10/Jun/2026 14:49:21] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:22] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:49:22] "[36mGET /static/js/dashboard.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:49:22] "[36mGET /static/js/charts.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:49:22] "[36mGET /static/js/ui.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:49:22] "[36mGET /static/js/transactions.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:49:22] "[36mGET /static/js/app.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:49:22] "GET /api/auth/me HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:22] "GET /api/profile HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:22] "GET /api/transactions HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:22] "GET /api/budgets HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:22] "GET /api/goals HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:22] "GET /api/investments HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:23] "POST /api/auth/logout HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:23] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:25] "[32mGET /auth/google HTTP/1.1[0m" 302 -
+127.0.0.1 - - [10/Jun/2026 14:49:29] "[32mGET /auth/google/callback?state=A1RaUtk3t4AV4lgeJSDKKvDOFpgf0g&iss=https://accounts.google.com&code=4/0AdkVLPzhRDPukmyfV6EfLljxPGatWdTv2BPTbEWnFcTXH6HJPEKSwxX690zDsMU3HDd1iA&scope=email+profile+https://www.googleapis.com/auth/userinfo.profile+openid+https://www.googleapis.com/auth/userinfo.email&authuser=3&prompt=none HTTP/1.1[0m" 302 -
+127.0.0.1 - - [10/Jun/2026 14:49:29] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:29] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:49:29] "[36mGET /static/js/ui.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:49:29] "[36mGET /static/js/charts.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:49:29] "[36mGET /static/js/dashboard.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:49:29] "[36mGET /static/js/transactions.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:49:29] "[36mGET /static/js/app.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:49:29] "GET /api/auth/me HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:29] "GET /api/profile HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:29] "GET /api/transactions HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:29] "GET /api/budgets HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:29] "GET /api/goals HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:29] "GET /api/investments HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:31] "POST /api/auth/logout HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:31] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:33] "POST /api/auth/login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:33] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:34] "[36mGET /static/js/ui.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:49:34] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:49:34] "[36mGET /static/js/charts.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:49:34] "[36mGET /static/js/dashboard.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:49:34] "[36mGET /static/js/transactions.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:49:34] "[36mGET /static/js/app.js HTTP/1.1[0m" 304 -
+127.0.0.1 - - [10/Jun/2026 14:49:34] "GET /api/auth/me HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:34] "GET /api/profile HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:34] "GET /api/transactions HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:34] "GET /api/goals HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:34] "GET /api/budgets HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:49:34] "GET /api/investments HTTP/1.1" 200 -
+ * Detected change in '/home/nazeer/WealthSync/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 420-456-749
+ * Detected change in '/home/nazeer/WealthSync/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 420-456-749
+ * Detected change in '/home/nazeer/WealthSync/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 420-456-749
+ * Detected change in '/home/nazeer/WealthSync/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 420-456-749
+ * Detected change in '/home/nazeer/WealthSync/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 420-456-749
+ * Detected change in '/home/nazeer/WealthSync/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 420-456-749
+ * Detected change in '/home/nazeer/WealthSync/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 420-456-749
+ * Detected change in '/home/nazeer/WealthSync/app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 420-456-749
+127.0.0.1 - - [10/Jun/2026 14:59:11] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:59:12] "GET /static/css/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:59:12] "GET /static/js/ui.js HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:59:12] "GET /static/js/app.js HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:59:12] "GET /static/js/charts.js HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:59:12] "GET /static/js/transactions.js HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:59:12] "GET /static/js/dashboard.js HTTP/1.1" 200 -
+/home/nazeer/WealthSync/app.py:145: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  return User.query.get(uid) if uid else None
+127.0.0.1 - - [10/Jun/2026 14:59:12] "GET /api/auth/me HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:59:12] "GET /api/profile HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:59:12] "GET /api/transactions HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:59:12] "GET /api/budgets HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:59:12] "GET /api/goals HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:59:12] "GET /api/investments HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:59:12] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+127.0.0.1 - - [10/Jun/2026 14:59:14] "POST /api/auth/logout HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 14:59:15] "GET /login HTTP/1.1" 200 -
+/home/nazeer/WealthSync/app.py:198: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  expires = datetime.utcnow() + timedelta(hours=24)
+127.0.0.1 - - [10/Jun/2026 14:59:44] "[35m[1mPOST /api/auth/signup HTTP/1.1[0m" 201 -
+127.0.0.1 - - [10/Jun/2026 14:59:44] "GET /verify-pending?email=nazeer0906s@gmail.com HTTP/1.1" 200 -
+/home/nazeer/WealthSync/app.py:579: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  datetime.utcnow() > user.email_verification_expires - timedelta(hours=23, minutes=59):
+127.0.0.1 - - [10/Jun/2026 15:00:29] "POST /api/auth/resend-verification HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 15:00:41] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 15:00:44] "[31m[1mPOST /api/auth/login HTTP/1.1[0m" 403 -
+127.0.0.1 - - [10/Jun/2026 15:00:44] "GET /verify-pending?email=nazeer0906s@gmail.com HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 15:00:48] "GET /login HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 15:01:19] "[35m[1mPOST /api/auth/signup HTTP/1.1[0m" 201 -
+127.0.0.1 - - [10/Jun/2026 15:01:19] "GET /verify-pending?email=syednazeer2007s@gmail.com HTTP/1.1" 200 -
+127.0.0.1 - - [10/Jun/2026 15:01:31] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -

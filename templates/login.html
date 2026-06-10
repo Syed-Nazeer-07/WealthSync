@@ -231,11 +231,45 @@
                         class="w-full px-4 py-3 bg-slate-900/80 border border-slate-800 rounded-2xl text-sm text-white focus:outline-none transition-all">
                     <label for="s-email">Email address</label>
                 </div>
-                <div class="field">
-                    <input type="password" name="password" id="s-pass" required placeholder=" "
-                        class="w-full px-4 py-3 bg-slate-900/80 border border-slate-800 rounded-2xl text-sm text-white focus:outline-none transition-all">
-                    <label for="s-pass">Password (min. 6 characters)</label>
+
+                <!-- Password with show/hide + strength -->
+                <div>
+                    <div class="field relative">
+                        <input type="password" name="password" id="s-pass" required placeholder=" " oninput="updateStrength()"
+                            class="w-full px-4 pr-11 py-3 bg-slate-900/80 border border-slate-800 rounded-2xl text-sm text-white focus:outline-none transition-all">
+                        <label for="s-pass">Password</label>
+                        <button type="button" onclick="togglePass('s-pass','eye-s1')" tabindex="-1"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
+                            <i id="eye-s1" data-lucide="eye" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <!-- Strength bar -->
+                    <div class="mt-2 space-y-1" id="strength-area">
+                        <div class="flex gap-1">
+                            <div id="sb1" class="h-1 flex-1 rounded-full bg-slate-800 transition-all duration-300"></div>
+                            <div id="sb2" class="h-1 flex-1 rounded-full bg-slate-800 transition-all duration-300"></div>
+                            <div id="sb3" class="h-1 flex-1 rounded-full bg-slate-800 transition-all duration-300"></div>
+                        </div>
+                        <p id="strength-label" class="text-xs text-slate-600"></p>
+                        <ul id="req-list" class="text-xs space-y-0.5 text-slate-600">
+                            <li id="req-len">  <span class="mr-1">·</span>At least 8 characters</li>
+                            <li id="req-upper"><span class="mr-1">·</span>At least 1 uppercase letter</li>
+                            <li id="req-num">  <span class="mr-1">·</span>At least 1 number</li>
+                        </ul>
+                    </div>
                 </div>
+
+                <!-- Confirm password -->
+                <div class="field relative">
+                    <input type="password" name="confirm_password" id="s-confirm" required placeholder=" " oninput="checkMatch()"
+                        class="w-full px-4 pr-11 py-3 bg-slate-900/80 border border-slate-800 rounded-2xl text-sm text-white focus:outline-none transition-all">
+                    <label for="s-confirm">Confirm password</label>
+                    <button type="button" onclick="togglePass('s-confirm','eye-s2')" tabindex="-1"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
+                        <i id="eye-s2" data-lucide="eye" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <p id="match-msg" class="text-xs px-1 hidden"></p>
             </div>
 
             <p id="signup-error" class="text-rose-400 text-sm px-1 hidden"></p>
@@ -302,6 +336,10 @@
                 body: JSON.stringify({ email: fd.get('email'), password: fd.get('password') })
             });
             const data = await res.json();
+            if (res.status === 403 && data.unverified) {
+                window.location.replace('/verify-pending?email=' + encodeURIComponent(data.email));
+                return;
+            }
             if (!res.ok) throw new Error(data.error);
             window.location.replace('/');
         } catch (err) {
@@ -317,22 +355,82 @@
         const btn   = document.getElementById('signup-btn');
         const errEl = document.getElementById('signup-error');
         const fd    = new FormData(e.target);
+
+        const pass    = fd.get('password');
+        const confirm = fd.get('confirm_password');
+        if (pass !== confirm) {
+            errEl.textContent = 'Passwords do not match.';
+            errEl.classList.remove('hidden');
+            return;
+        }
+
         btn.disabled = true;
         btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" stroke-dasharray="60" stroke-dashoffset="30"/></svg><span>Creating account…</span>';
         errEl.classList.add('hidden');
         try {
             const res  = await fetch('/api/auth/signup', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: fd.get('name'), email: fd.get('email'), password: fd.get('password') })
+                body: JSON.stringify({ name: fd.get('name'), email: fd.get('email'), password: pass })
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error);
-            window.location.replace("/onboarding");
+            // pending:true — go to verify pending page
+            window.location.replace('/verify-pending?email=' + encodeURIComponent(fd.get('email')));
         } catch (err) {
             errEl.textContent = err.message; errEl.classList.remove('hidden');
             btn.disabled = false;
             btn.innerHTML = '<span>Create Account</span><i data-lucide="arrow-right" class="w-4 h-4"></i>';
             lucide.createIcons({ nodes: [btn] });
+        }
+    }
+
+    function togglePass(inputId, iconId) {
+        const inp = document.getElementById(inputId);
+        const isHidden = inp.type === 'password';
+        inp.type = isHidden ? 'text' : 'password';
+        document.getElementById(iconId).setAttribute('data-lucide', isHidden ? 'eye-off' : 'eye');
+        lucide.createIcons({ nodes: [document.getElementById(iconId).parentElement] });
+    }
+
+    function updateStrength() {
+        const v = document.getElementById('s-pass').value;
+        const hasLen   = v.length >= 8;
+        const hasUpper = /[A-Z]/.test(v);
+        const hasNum   = /[0-9]/.test(v);
+        const score    = [hasLen, hasUpper, hasNum].filter(Boolean).length;
+
+        const colors = ['', 'bg-rose-500', 'bg-amber-500', 'bg-emerald-500'];
+        const labels = ['', 'Weak', 'Medium', 'Strong'];
+        const txtCls = ['', 'text-rose-400', 'text-amber-400', 'text-emerald-400'];
+
+        for (let i = 1; i <= 3; i++) {
+            const bar = document.getElementById('sb' + i);
+            bar.className = 'h-1 flex-1 rounded-full transition-all duration-300 ' + (i <= score ? colors[score] : 'bg-slate-800');
+        }
+        const lbl = document.getElementById('strength-label');
+        lbl.textContent = v.length ? labels[score] : '';
+        lbl.className = 'text-xs ' + (v.length ? txtCls[score] : 'text-slate-600');
+
+        const reqStyle = (ok) => ok ? 'text-xs text-emerald-500' : 'text-xs text-slate-600';
+        document.getElementById('req-len').className   = reqStyle(hasLen);
+        document.getElementById('req-upper').className = reqStyle(hasUpper);
+        document.getElementById('req-num').className   = reqStyle(hasNum);
+
+        checkMatch();
+    }
+
+    function checkMatch() {
+        const p = document.getElementById('s-pass').value;
+        const c = document.getElementById('s-confirm').value;
+        const msg = document.getElementById('match-msg');
+        if (!c) { msg.classList.add('hidden'); return; }
+        msg.classList.remove('hidden');
+        if (p === c) {
+            msg.textContent = '✓ Passwords match';
+            msg.className = 'text-xs px-1 text-emerald-400';
+        } else {
+            msg.textContent = '✗ Passwords do not match';
+            msg.className = 'text-xs px-1 text-rose-400';
         }
     }
 </script>

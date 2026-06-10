@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WealthSync – Verify Your Email</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{dark:{bg:'#0B0F19',card:'#111827',border:'#1F2937'},brand:{500:'#3b82f6',600:'#2563eb'}}}}}</script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>body{font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}</style>
+</head>
+<body class="bg-dark-bg min-h-screen flex items-center justify-center p-6">
+    <div class="w-full max-w-md text-center">
+
+        <!-- Logo -->
+        <div class="flex items-center justify-center gap-2.5 mb-10">
+            <div class="p-2 bg-gradient-to-br from-brand-500 to-indigo-600 rounded-xl text-white shadow-lg">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <span class="font-bold text-xl text-white">WealthSync</span>
+        </div>
+
+        <!-- Card -->
+        <div class="bg-dark-card border border-dark-border rounded-3xl p-10">
+            <!-- Icon -->
+            <div class="w-16 h-16 rounded-full bg-brand-600/20 border border-brand-500/30 flex items-center justify-center mx-auto mb-6">
+                <i data-lucide="mail" class="w-8 h-8 text-brand-400"></i>
+            </div>
+
+            <h1 class="text-2xl font-bold text-white mb-2">Check your inbox</h1>
+            <p class="text-slate-400 text-sm leading-relaxed mb-2">We've sent a verification link to</p>
+            {% if email %}
+            <p class="font-semibold text-brand-400 mb-6 text-sm">{{ email }}</p>
+            {% else %}
+            <p class="text-slate-300 mb-6 text-sm">your email address.</p>
+            {% endif %}
+            <p class="text-slate-500 text-xs mb-8">Click the link in the email to activate your account. The link expires in 24 hours.</p>
+
+            <!-- Resend -->
+            <div id="resend-area">
+                <p class="text-slate-500 text-xs mb-3">Didn't receive it? Check your spam folder, or</p>
+                <button id="resend-btn" onclick="resend()"
+                    class="w-full py-3 border border-slate-700 hover:border-brand-500/50 text-slate-300 hover:text-white rounded-2xl text-sm font-semibold transition-all hover:bg-brand-500/5">
+                    Resend verification email
+                </button>
+                <p id="resend-msg" class="mt-3 text-xs text-emerald-400 hidden"></p>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-dark-border">
+                <a href="/login" class="text-slate-500 hover:text-slate-300 text-xs transition-colors">← Back to sign in</a>
+            </div>
+        </div>
+    </div>
+
+<script>
+    lucide.createIcons();
+    const email = {{ email | tojson }};
+
+    async function resend() {
+        const btn = document.getElementById('resend-btn');
+        const msg = document.getElementById('resend-msg');
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
+        try {
+            await fetch('/api/auth/resend-verification', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({email})
+            });
+            msg.textContent = 'A new link has been sent. Please check your inbox.';
+            msg.classList.remove('hidden');
+            btn.textContent = 'Resend verification email';
+            // Cooldown 60s
+            let t = 60;
+            btn.disabled = true;
+            btn.textContent = `Resend again in ${t}s`;
+            const iv = setInterval(() => {
+                t--;
+                if (t <= 0) { clearInterval(iv); btn.disabled = false; btn.textContent = 'Resend verification email'; }
+                else btn.textContent = `Resend again in ${t}s`;
+            }, 1000);
+        } catch(e) {
+            btn.disabled = false;
+            btn.textContent = 'Resend verification email';
+        }
+    }
+</script>
+</body>
+</html>

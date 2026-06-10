@@ -1,10 +1,11 @@
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail, Message
 from authlib.integrations.flask_client import OAuth
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
-import os
+import os, secrets
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
@@ -14,7 +15,15 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///wealthsync.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-change-in-production")
 
+app.config["MAIL_SERVER"]   = os.environ.get("MAIL_SERVER", "smtp.gmail.com")
+app.config["MAIL_PORT"]     = int(os.environ.get("MAIL_PORT", 587))
+app.config["MAIL_USE_TLS"]  = True
+app.config["MAIL_USERNAME"] = os.environ.get("MAIL_USERNAME")
+app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
+app.config["MAIL_DEFAULT_SENDER"] = os.environ.get("MAIL_DEFAULT_SENDER", os.environ.get("MAIL_USERNAME"))
+
 db = SQLAlchemy(app)
+mail = Mail(app)
 
 oauth = OAuth(app)
 google = oauth.register(
@@ -35,6 +44,9 @@ class User(db.Model):
     password_hash = db.Column(db.String(256), nullable=True)
     google_id     = db.Column(db.String(128), nullable=True, index=True)
     created_at    = db.Column(db.DateTime, default=datetime.utcnow)
+    email_verified            = db.Column(db.Boolean, default=False, nullable=False)
+    email_verification_token  = db.Column(db.String(100), nullable=True)
+    email_verification_expires = db.Column(db.DateTime, nullable=True)
 
     profile      = db.relationship("Profile",     back_populates="user", uselist=False, cascade="all, delete-orphan")
     transactions = db.relationship("Transaction", back_populates="user", cascade="all, delete-orphan")
@@ -167,25 +179,39 @@ def login_page():
 @app.route("/api/auth/signup", methods=["POST"])
 def signup():
     data = request.get_json(silent=True) or {}
-    name  = (data.get("name") or "").strip()
-    email = (data.get("email") or "").strip().lower()
+    name     = (data.get("name") or "").strip()
+    email    = (data.get("email") or "").strip().lower()
     password = data.get("password") or ""
 
     if not name or not email or not password:
         return jsonify({"error": "Name, email and password are required"}), 400
-    if len(password) < 6:
-        return jsonify({"error": "Password must be at least 6 characters"}), 400
+    if len(password) < 8:
+        return jsonify({"error": "Password must be at least 8 characters"}), 400
+    if not any(c.isupper() for c in password):
+        return jsonify({"error": "Password must contain at least one uppercase letter"}), 400
+    if not any(c.isdigit() for c in password):
+        return jsonify({"error": "Password must contain at least one number"}), 400
     if User.query.filter_by(email=email).first():
         return jsonify({"error": "An account with that email already exists"}), 409
 
-    user = User(name=name, email=email, password_hash=generate_password_hash(password))
+    token   = secrets.token_urlsafe(32)
+    expires = datetime.utcnow() + timedelta(hours=24)
+
+    user = User(
+        name=name, email=email,
+        password_hash=generate_password_hash(password),
+        email_verified=False,
+        email_verification_token=token,
+        email_verification_expires=expires,
+    )
     db.session.add(user)
     db.session.flush()
     db.session.add(Profile(user_id=user.id))
     db.session.commit()
 
-    session["user_id"] = user.id
-    return jsonify({"id": user.id, "name": user.name, "email": user.email}), 201
+    _send_verification_email(user, token)
+
+    return jsonify({"pending": True, "email": email}), 201
 
 
 @app.route("/api/auth/login", methods=["POST"])
@@ -195,8 +221,10 @@ def login():
     password = data.get("password") or ""
 
     user = User.query.filter_by(email=email).first()
-    if not user or not check_password_hash(user.password_hash, password):
+    if not user or not user.password_hash or not check_password_hash(user.password_hash, password):
         return jsonify({"error": "Invalid email or password"}), 401
+    if not user.email_verified:
+        return jsonify({"error": "Please verify your email before continuing.", "unverified": True, "email": email}), 403
 
     session["user_id"] = user.id
     return jsonify({"id": user.id, "name": user.name, "email": user.email})
@@ -489,6 +517,74 @@ def delete_investment(inv_id):
     return jsonify({"success": True})
 
 
+# ─── Email helper ─────────────────────────────────────────────────────────────
+
+def _send_verification_email(user, token):
+    verify_url = url_for("verify_email", token=token, _external=True)
+    html = f"""
+    <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;background:#0B0F19;color:#e2e8f0;border-radius:16px;overflow:hidden">
+      <div style="background:linear-gradient(135deg,#2563eb,#4f46e5);padding:32px 40px">
+        <h1 style="margin:0;font-size:24px;color:#fff">WealthSync</h1>
+        <p style="margin:4px 0 0;color:rgba(255,255,255,0.7);font-size:14px">Personal Financial OS</p>
+      </div>
+      <div style="padding:40px">
+        <h2 style="margin:0 0 8px;color:#f1f5f9;font-size:20px">Hi {user.name},</h2>
+        <p style="color:#94a3b8;margin:0 0 32px;line-height:1.6">Verify your email address to activate your WealthSync account and start tracking your finances.</p>
+        <a href="{verify_url}" style="display:inline-block;background:linear-gradient(135deg,#2563eb,#4f46e5);color:#fff;text-decoration:none;padding:14px 32px;border-radius:12px;font-weight:600;font-size:15px">Verify Email Address</a>
+        <p style="margin:32px 0 8px;color:#64748b;font-size:13px">Or copy this link:</p>
+        <p style="word-break:break-all;color:#60a5fa;font-size:12px;background:#1e293b;padding:12px;border-radius:8px">{verify_url}</p>
+        <p style="margin:24px 0 0;color:#475569;font-size:12px">This link expires in 24 hours. If you didn't create an account, you can safely ignore this email.</p>
+      </div>
+    </div>
+    """
+    try:
+        msg = Message(subject="Verify your WealthSync account", recipients=[user.email], html=html)
+        mail.send(msg)
+    except Exception:
+        pass  # Don't crash signup if mail fails; token is in DB for resend
+
+
+# ─── Verification routes ───────────────────────────────────────────────────────
+
+@app.route("/verify-email/<token>")
+def verify_email(token):
+    user = User.query.filter_by(email_verification_token=token).first()
+    if not user or not user.email_verification_expires or \
+       datetime.utcnow() > user.email_verification_expires:
+        return render_template("verify_failed.html")
+
+    user.email_verified = True
+    user.email_verification_token = None
+    user.email_verification_expires = None
+    db.session.commit()
+    return render_template("verify_success.html", name=user.name)
+
+
+@app.route("/verify-pending")
+def verify_pending():
+    email = request.args.get("email", "")
+    return render_template("verify_pending.html", email=email)
+
+
+@app.route("/api/auth/resend-verification", methods=["POST"])
+def resend_verification():
+    data  = request.get_json(silent=True) or {}
+    email = (data.get("email") or "").strip().lower()
+
+    # Always return success — no user enumeration
+    user = User.query.filter_by(email=email).first()
+    if user and not user.email_verified and user.password_hash:
+        # Rate limit: only resend if last token is >60s old
+        if not user.email_verification_expires or \
+           datetime.utcnow() > user.email_verification_expires - timedelta(hours=23, minutes=59):
+            user.email_verification_token   = secrets.token_urlsafe(32)
+            user.email_verification_expires = datetime.utcnow() + timedelta(hours=24)
+            db.session.commit()
+            _send_verification_email(user, user.email_verification_token)
+
+    return jsonify({"message": "If that email is registered and unverified, a new link has been sent."})
+
+
 @app.route("/auth/google")
 def google_login():
     redirect_uri = url_for("google_callback", _external=True)
@@ -508,20 +604,30 @@ def google_callback():
     email = info["email"]
     name = info.get("name") or email.split("@")[0]
 
+    is_new = False
     user = User.query.filter_by(google_id=google_id).first()
     if not user:
-        # Check if email already registered via password
         user = User.query.filter_by(email=email).first()
         if user:
-            user.google_id = google_id  # link accounts
+            user.google_id = google_id  # link existing account
+            user.email_verified = True
         else:
-            user = User(name=name, email=email, google_id=google_id)
+            user = User(name=name, email=email, google_id=google_id, email_verified=True)
             db.session.add(user)
             db.session.flush()
             db.session.add(Profile(user_id=user.id))
+            is_new = True
         db.session.commit()
 
     session["user_id"] = user.id
+
+    if is_new:
+        return redirect(url_for("onboarding_page"))
+
+    profile = Profile.query.filter_by(user_id=user.id).first()
+    if not profile or not profile.onboarding_completed:
+        return redirect(url_for("onboarding_page"))
+
     return redirect(url_for("index"))
 
 
