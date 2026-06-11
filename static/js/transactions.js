@@ -1,4 +1,3 @@
-// Tab view HTML generators for non-dashboard tabs — attached to App at runtime via app.js
 
 const AppViews = {
     getTransactionsHTML() {
@@ -48,7 +47,6 @@ const AppViews = {
             </div>
         `;
     },
-
     _getTxRows() {
         let filtered = this.state.transactions;
         if (this.state.txSearchQuery) {
@@ -100,7 +98,6 @@ const AppViews = {
             </tr>`;
         }).join('');
     },
-
     getBudgetsHTML() {
         const calc = this.getCalculations();
         const cardsHtml = calc.budgetProgress.map(b => {
@@ -109,7 +106,6 @@ const AppViews = {
             const remaining = b.limit - b.spent;
             const runRate = b.spent * 2;
             const forecastClass = runRate > b.limit ? 'text-rose-500' : 'text-emerald-500';
-
             return `
                 <div class="bg-white dark:bg-dark-card p-6 rounded-3xl border border-slate-200 dark:border-dark-border shadow-sm relative group hover-card flex flex-col">
                     <div class="absolute top-4 right-4 flex opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity gap-1">
@@ -146,7 +142,6 @@ const AppViews = {
                 </div>
             `;
         }).join('');
-
         return `
             <div class="space-y-6 slide-up pb-10">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
@@ -165,12 +160,10 @@ const AppViews = {
             </div>
         `;
     },
-
     getSavingsHTML() {
         const cardsHtml = this.state.savings.map(goal => {
             const percent = Math.min(((goal.current / goal.target) * 100), 100).toFixed(0);
             const isComplete = goal.current >= goal.target;
-            
             const forecast = this.getGoalForecast(goal.id);
             const healthColors = {
                 on_track: 'text-emerald-500 bg-emerald-50 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20',
@@ -179,17 +172,14 @@ const AppViews = {
                 complete: 'text-emerald-500 bg-emerald-50 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20'
             };
             const healthLabels = { on_track: 'On Track', behind: 'Behind', at_risk: 'At Risk', complete: 'Complete' };
-            
             let estimatedDateStr = 'Calculating...';
             let healthClass = healthColors.on_track;
             let healthLabel = 'Unknown';
             let scenariosHtml = '';
             let insightsHtml = '';
-            
             if (forecast) {
                 healthClass = healthColors[forecast.health] || healthColors.on_track;
                 healthLabel = healthLabels[forecast.health] || 'Unknown';
-                
                 if (forecast.currentPace?.date) {
                     const date = new Date(forecast.currentPace.date);
                     estimatedDateStr = date.toLocaleDateString(this.getCurrencyLocale(), { month: 'short', year: 'numeric', timeZone: this.state.settings?.timezone || 'UTC' });
@@ -198,7 +188,6 @@ const AppViews = {
                 } else {
                     estimatedDateStr = 'No savings';
                 }
-                
                 scenariosHtml = `
                     <div class="grid grid-cols-3 gap-2 text-xs">
                         <div class="text-center p-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
@@ -215,7 +204,6 @@ const AppViews = {
                         </div>
                     </div>
                 `;
-                
                 if (forecast.insights && forecast.insights.length > 0) {
                     insightsHtml = forecast.insights.map(insight => `
                         <div class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-400">
@@ -225,7 +213,6 @@ const AppViews = {
                     `).join('');
                 }
             }
-
             return `
                 <div class="bg-white dark:bg-dark-card p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-dark-border shadow-sm flex flex-col relative group hover-card">
                     ${isComplete ? '<div class="absolute top-0 left-0 w-full h-1.5 bg-emerald-500"></div>' : ''}
@@ -272,7 +259,6 @@ const AppViews = {
                 </div>
             `;
         }).join('');
-
         return `
             <div class="space-y-6 slide-up pb-10">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
@@ -294,18 +280,15 @@ const AppViews = {
             </div>
         `;
     },
-
     getInvestmentsHTML() {
         const calc = this.getCalculations();
         let riskProfile = "Balanced";
-
         let rowsHtml = this.state.investments.map(inv => {
             const currentTotal = inv.shares * inv.currentPrice;
             const costTotal = inv.shares * inv.avgCost;
             const profit = currentTotal - costTotal;
             const profitPercent = costTotal > 0 ? (profit / costTotal) * 100 : 0;
             const isPositive = profit >= 0;
-
             return `
                 <tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-dark-border last:border-0">
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -332,7 +315,6 @@ const AppViews = {
                 </tr>
             `;
         }).join('');
-
         return `
             <div class="space-y-6 slide-up pb-10">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
@@ -401,16 +383,12 @@ const AppViews = {
             </div>
         `;
     },
-
     getSettingsHTML() {
         const u = this.state.currentUser || {};
         const s = this.state.settings || {};
         const isGoogle = !!u.google_id;
         const verified = u.email_verified;
-
-        // Initials avatar
         const initials = (u.name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-
         const section = (title, icon, content) => `
             <div class="bg-white dark:bg-dark-card rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm overflow-hidden">
                 <div class="px-6 py-4 border-b border-slate-100 dark:border-dark-border flex items-center gap-2">
@@ -419,13 +397,11 @@ const AppViews = {
                 </div>
                 <div class="px-6 py-5 space-y-4">${content}</div>
             </div>`;
-
         const row = (label, value) => `
             <div class="flex items-center justify-between py-1">
                 <span class="text-sm text-slate-500 dark:text-slate-400">${label}</span>
                 <span class="text-sm font-medium text-slate-900 dark:text-white">${value}</span>
             </div>`;
-
         const currencies = [
             { code: 'INR', label: '₹ Indian Rupee' },
             { code: 'USD', label: '$ US Dollar' },
@@ -434,14 +410,12 @@ const AppViews = {
             { code: 'AED', label: 'د.إ UAE Dirham' },
             { code: 'SGD', label: 'S$ Singapore Dollar' },
         ];
-
         return `
         <div class="space-y-6 slide-up pb-10 max-w-2xl mx-auto">
             <div>
                 <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Settings</h2>
                 <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Manage your account, preferences and data.</p>
             </div>
-
             <!-- Profile -->
             ${section('Profile', 'user', `
                 <div class="flex items-center gap-4 pb-4 border-b border-slate-100 dark:border-dark-border">
@@ -458,7 +432,6 @@ const AppViews = {
                 ${row('Login Method', isGoogle
                     ? '<span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Google</span>'
                     : '<span class="flex items-center gap-1"><i data-lucide="mail" class="w-3.5 h-3.5"></i> Email</span>')}
-
                 <!-- Edit name -->
                 <div class="pt-2">
                     <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Display Name</label>
@@ -467,11 +440,9 @@ const AppViews = {
                         <button onclick="App.saveSettingName()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-medium transition-colors">Save</button>
                     </div>
                 </div>
-
                 <!-- Resend verification -->
                 ${!verified ? `<button onclick="App.resendVerification()" class="text-sm text-brand-600 dark:text-brand-400 hover:underline flex items-center gap-1"><i data-lucide="send" class="w-3.5 h-3.5"></i> Resend verification email</button>` : ''}
             `)}
-
             <!-- Change Password -->
             ${!isGoogle ? section('Security', 'lock', `
                 <div class="space-y-3">
@@ -492,7 +463,6 @@ const AppViews = {
                     <p class="text-sm text-slate-600 dark:text-slate-400">Password is managed by Google. Sign in with Google to change it.</p>
                 </div>
             `)}
-
             <!-- Appearance -->
             ${section('Appearance', 'palette', `
                 <div class="flex items-center justify-between">
@@ -525,8 +495,6 @@ const AppViews = {
                     </div>
                 </div>
             `)}
-
-
             <!-- Account Mode -->
             ${section('Account Mode', 'user-circle', `
                 <div class="space-y-4">
@@ -556,12 +524,10 @@ const AppViews = {
                     </div>
                 </div>
             `)}
-
             <!-- Financial Profile -->
             ${section('Financial Profile', 'wallet', `
                 <div class="space-y-4">
                     <p class="text-xs text-slate-500 dark:text-slate-400">Update your financial information used for calculations and insights.</p>
-                    
                     ${(this.state.profile?.account_mode || 'income') === 'income' ? `
                         <div>
                             <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Monthly Income</label>
@@ -572,7 +538,6 @@ const AppViews = {
                             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Your regular monthly income (salary, freelance, etc.)</p>
                         </div>
                     ` : ''}
-                    
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Current Savings</label>
                         <div class="relative">
@@ -581,7 +546,6 @@ const AppViews = {
                         </div>
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Balance in savings accounts, FDs, liquid funds</p>
                     </div>
-                    
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Current Investments</label>
                         <div class="relative">
@@ -590,7 +554,6 @@ const AppViews = {
                         </div>
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Total value of stocks, mutual funds, ETFs, crypto, etc.</p>
                     </div>
-                    
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Monthly Expenses</label>
                         <div class="relative">
@@ -599,12 +562,10 @@ const AppViews = {
                         </div>
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Typical monthly spending (rent, food, bills, etc.)</p>
                     </div>
-                    
                     <p id="profile-save-err" class="text-rose-500 text-xs hidden"></p>
                     <button onclick="App.saveFinancialProfile()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-medium transition-colors">Save Changes</button>
                 </div>
             `)}
-
             <!-- Timezone -->
             ${section('Timezone', 'clock', `
                 <div>
@@ -630,7 +591,6 @@ const AppViews = {
                     </select>
                 </div>
             `)}
-
             <!-- Category Management -->
             ${section('Categories', 'tag', `
                 <div class="space-y-3">
@@ -663,7 +623,6 @@ const AppViews = {
                     </div>
                 </div>
             `)}
-
             <!-- Data Export -->
             ${section('Data Export', 'download', `
                 <div class="flex flex-col sm:flex-row gap-3">
@@ -675,7 +634,6 @@ const AppViews = {
                     </a>
                 </div>
             `)}
-
             <!-- Danger Zone -->
             <div class="bg-white dark:bg-dark-card rounded-2xl border border-rose-200 dark:border-rose-900/50 shadow-sm overflow-hidden">
                 <div class="px-6 py-4 border-b border-rose-100 dark:border-rose-900/30 flex items-center gap-2">
@@ -706,7 +664,6 @@ const AppViews = {
                     </div>
                 </div>
             </div>
-
             <!-- Logout -->
             <button onclick="App.logout()" class="w-full flex items-center justify-center gap-2 px-4 py-3 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl text-sm font-semibold transition-colors">
                 <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out

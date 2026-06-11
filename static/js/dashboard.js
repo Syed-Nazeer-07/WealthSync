@@ -1,4 +1,3 @@
-// Dashboard tab view — attached to App at runtime via app.js
 
 const AppDashboard = {
     getDashboardHTML() {
@@ -8,31 +7,24 @@ const AppDashboard = {
         const insights = this.getSmartInsights('month');
         const streak = this.getStreak();
         const isCashFlow = this.state.profile?.account_mode === 'cashflow';
-
-        // ── Financial Insights (real data only) ────────────────────────────
         const financialInsights = [];
         const now = new Date();
         const thisYM = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
         const lastMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
         const lastYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
         const lastYM = `${lastYear}-${String(lastMonth+1).padStart(2,'0')}`;
-        
         const txThis = this.state.transactions.filter(t => t.date.startsWith(thisYM));
         const txLast = this.state.transactions.filter(t => t.date.startsWith(lastYM));
-        
-        // Category spending changes
         const catThis = {}, catLast = {};
         txThis.filter(t => t.type === 'expense').forEach(t => catThis[t.category] = (catThis[t.category]||0) + t.amount);
         txLast.filter(t => t.type === 'expense').forEach(t => catLast[t.category] = (catLast[t.category]||0) + t.amount);
-        
         Object.keys({...catThis, ...catLast}).forEach(cat => {
             const curr = catThis[cat] || 0;
             const prev = catLast[cat] || 0;
             const diff = curr - prev;
             const pct = prev > 0 ? Math.round((diff / prev) * 100) : null;
-            
-            if (Math.abs(diff) > 500) { // Ignore changes < ₹500
-                if (pct !== null && Math.abs(pct) >= 10) { // Ignore < 10% changes
+            if (Math.abs(diff) > 500) { 
+                if (pct !== null && Math.abs(pct) >= 10) { 
                     if (diff > 0) {
                         financialInsights.push({
                             icon: 'trending-up',
@@ -55,15 +47,12 @@ const AppDashboard = {
                 }
             }
         });
-        
-        // Savings rate
         const incThis = txThis.filter(t => t.type === 'income').reduce((s,t) => s + t.amount, 0);
         const expThis = txThis.filter(t => t.type === 'expense').reduce((s,t) => s + t.amount, 0);
         const incLast = txLast.filter(t => t.type === 'income').reduce((s,t) => s + t.amount, 0);
         const expLast = txLast.filter(t => t.type === 'expense').reduce((s,t) => s + t.amount, 0);
         const srThis = incThis > 0 ? ((incThis - expThis) / incThis * 100) : 0;
         const srLast = incLast > 0 ? ((incLast - expLast) / incLast * 100) : 0;
-        
         if (Math.abs(srThis - srLast) >= 5 && incThis > 0) {
             financialInsights.push({
                 icon: srThis > srLast ? 'arrow-up-circle' : 'arrow-down-circle',
@@ -71,8 +60,6 @@ const AppDashboard = {
                 text: `Savings rate ${srThis > srLast ? 'improved' : 'decreased'} from ${srLast.toFixed(0)}% to ${srThis.toFixed(0)}%.`
             });
         }
-        
-        // Annual savings projection
         if (incThis > 0 && expThis > 0) {
             const monthlySavings = incThis - expThis;
             if (monthlySavings > 0) {
@@ -84,17 +71,13 @@ const AppDashboard = {
                 });
             }
         }
-        
-        // Goal progress
         if (this.state.savings.length > 0) {
             const goalsThisMonth = this.state.savings.filter(g => {
                 const lastUpdate = new Date(g.target_date || Date.now());
                 return lastUpdate.getMonth() === now.getMonth();
             });
-            
             const avgProgress = this.state.savings.reduce((sum, g) => 
                 sum + Math.min(100, (g.current / g.target) * 100), 0) / this.state.savings.length;
-            
             if (avgProgress >= 75) {
                 financialInsights.push({
                     icon: 'target',
@@ -109,15 +92,10 @@ const AppDashboard = {
                 });
             }
         }
-        
-        // Limit to top 5 insights
         const topInsights = financialInsights.slice(0, 5);
-
         const timeOfDay = new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening';
         const showGreeting = this.state.settings?.show_greeting !== false;
         const sym = this.getCurrencySymbol();
-
-        // ── Monthly Report helpers ──────────────────────────────────────────
         const gradeDesc = { A: 'Excellent', B: 'Good', C: 'Fair', D: 'Needs Work', F: 'At Risk' };
         const reportMetrics = [
             { label: isCashFlow ? 'Money Received' : 'Income',    value: this.formatCurrency(report.income),    color: 'text-emerald-600 dark:text-emerald-400' },
@@ -125,8 +103,6 @@ const AppDashboard = {
             { label: isCashFlow ? 'Remaining Balance' : 'Saved',     value: this.formatCurrency(report.savings),   color: report.savings >= 0 ? 'text-brand-600 dark:text-brand-400' : 'text-rose-600 dark:text-rose-400' },
             { label: 'Net ∆',     value: (report.netChange >= 0 ? '+' : '') + this.formatCurrency(report.netChange), color: report.netChange >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' },
         ];
-
-        // ── Goal Progress ───────────────────────────────────────────────────
         const goalsHtml = this.state.savings.length === 0
             ? `<div class="flex flex-col items-center justify-center py-8 text-slate-400 dark:text-slate-500 text-sm gap-2">
                 <i data-lucide="target" class="w-8 h-8 opacity-40"></i>
@@ -135,11 +111,9 @@ const AppDashboard = {
             : this.state.savings.map(goal => {
                 const pct = Math.min(100, goal.target > 0 ? (goal.current / goal.target) * 100 : 0);
                 const isComplete = pct >= 100;
-                
                 const forecast = this.getGoalForecast(goal.id);
                 let etaStr = 'Calculating...';
                 let healthBadge = '';
-                
                 if (forecast) {
                     if (forecast.health === 'complete') {
                         etaStr = '✅ Complete';
@@ -149,7 +123,6 @@ const AppDashboard = {
                     } else {
                         etaStr = 'No savings detected';
                     }
-                    
                     const healthColors = {
                         on_track: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
                         behind: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
@@ -164,7 +137,6 @@ const AppDashboard = {
                     };
                     healthBadge = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${healthColors[forecast.health] || healthColors.on_track}">${healthLabels[forecast.health] || 'Unknown'}</span>`;
                 }
-                
                 return `
                 <div class="py-3 border-b border-slate-100 dark:border-dark-border last:border-0">
                     <div class="flex justify-between items-start mb-1.5">
@@ -183,8 +155,6 @@ const AppDashboard = {
                     </div>
                 </div>`;
             }).join('');
-
-        // ── Recent Activity ─────────────────────────────────────────────────
         const txGroup = (label, txList) => {
             if (!txList.length) return '';
             return `<div class="mb-3">
@@ -202,7 +172,6 @@ const AppDashboard = {
                 </div>`).join('')}
             </div>`;
         };
-
         const hasActivity = activity.today.length + activity.yesterday.length + activity.earlier.length > 0;
         const activityHtml = hasActivity
             ? txGroup('Today', activity.today) + txGroup('Yesterday', activity.yesterday) + txGroup('Earlier', activity.earlier)
@@ -210,8 +179,6 @@ const AppDashboard = {
                 <i data-lucide="receipt" class="w-8 h-8 opacity-40"></i>
                 <p>No recent transactions</p>
                </div>`;
-
-        // ── Smart Insights ──────────────────────────────────────────────────
         const insightColors = {
             warning: 'bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20 text-amber-800 dark:text-amber-300',
             success: 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-300',
@@ -223,10 +190,8 @@ const AppDashboard = {
                 <i data-lucide="${ins.icon}" class="w-4 h-4 shrink-0 mt-0.5"></i>
                 <span>${ins.text}</span>
             </div>`).join('');
-
         return `
         <div class="space-y-6 sm:space-y-8 pb-10">
-
             <!-- Header -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 slide-up">
                 ${showGreeting
@@ -242,7 +207,6 @@ const AppDashboard = {
                     <i data-lucide="plus" class="w-4 h-4"></i> Add Transaction
                 </button>
             </div>
-
             <!-- Row 1: Net Worth Hero + Financial Health -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 slide-up delay-100">
                 <div class="lg:col-span-2 relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-slate-900 dark:bg-dark-card border border-slate-800 dark:border-dark-border text-white shadow-2xl hover-card">
@@ -266,7 +230,6 @@ const AppDashboard = {
                         </div>
                     </div>
                 </div>
-
                 <!-- Financial Health -->
                 <div id="financial-health-card" class="bg-white dark:bg-dark-card rounded-3xl p-6 border border-slate-200 dark:border-dark-border shadow-sm hover-card flex flex-col">
                     <div class="flex justify-between items-start mb-4">
@@ -296,7 +259,6 @@ const AppDashboard = {
                     </div>
                 </div>
             </div>
-
             <!-- Row 2: Monthly Summary + Budget Snapshot -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 slide-up delay-150">
                 <!-- Monthly Summary -->
@@ -322,7 +284,6 @@ const AppDashboard = {
                         </div>
                     </div>
                 </div>
-
                 <!-- Budget Snapshot -->
                 <div class="bg-white dark:bg-dark-card rounded-3xl p-6 border border-slate-200 dark:border-dark-border shadow-sm hover-card">
                     <div class="flex items-center justify-between mb-4">
@@ -352,10 +313,8 @@ const AppDashboard = {
                     }).join('') : '<div class="flex flex-col items-center justify-center py-6 text-slate-400 dark:text-slate-500"><i data-lucide="pie-chart" class="w-8 h-8 mb-2 opacity-40"></i><p class="text-sm">No budgets set</p><button onclick="App.openModal(\'budget\')" class="text-xs text-brand-500 hover:underline mt-1">Create Budget</button></div>'}
                 </div>
             </div>
-
             <!-- Row 3: Recent Activity + Goals + Insights -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 slide-up delay-200">
-                
                 <!-- Recent Activity -->
                 <div class="bg-white dark:bg-dark-card rounded-3xl p-6 border border-slate-200 dark:border-dark-border shadow-sm hover-card">
                     <div class="flex items-center justify-between mb-4">
@@ -378,7 +337,6 @@ const AppDashboard = {
                         </div>`).join('') || '<div class="flex flex-col items-center justify-center py-8 text-slate-400 dark:text-slate-500"><i data-lucide="receipt" class="w-8 h-8 mb-2 opacity-40"></i><p class="text-sm">No recent transactions</p></div>'}
                     </div>
                 </div>
-
                 <!-- Goal Progress -->
                 <div class="bg-white dark:bg-dark-card rounded-3xl p-6 border border-slate-200 dark:border-dark-border shadow-sm hover-card">
                     <div class="flex items-center justify-between mb-4">
@@ -389,7 +347,6 @@ const AppDashboard = {
                     </div>
                     ${goalsHtml}
                 </div>
-
                 <!-- Smart Insights -->
                 <div class="bg-white dark:bg-dark-card rounded-3xl p-6 border border-slate-200 dark:border-dark-border shadow-sm hover-card">
                     <h3 class="font-bold text-sm text-slate-900 dark:text-white mb-4 flex items-center gap-2">
@@ -398,7 +355,6 @@ const AppDashboard = {
                     <div class="space-y-2 max-h-64 overflow-y-auto">${insightsHtml || '<p class="text-xs text-slate-400">No insights available</p>'}</div>
                 </div>
             </div>
-
             <!-- Row 3: Charts -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 slide-up delay-300">
                 <div class="bg-white dark:bg-dark-card p-6 rounded-3xl border border-slate-200 dark:border-dark-border shadow-sm hover-card">
@@ -410,16 +366,11 @@ const AppDashboard = {
                     <div class="h-56 relative w-full flex justify-center"><canvas id="expenseChart"></canvas></div>
                 </div>
             </div>
-
         </div>`;
     },
-
-    // Surgically re-render only the insights panel when the period tab changes.
     _dashInsightPeriod(period) {
         const content = document.getElementById('insights-content');
         if (!content) return;
-
-        // Update tab styles
         ['week','month','year'].forEach(p => {
             const btn = document.getElementById(`insight-tab-${p}`);
             if (!btn) return;
@@ -427,7 +378,6 @@ const AppDashboard = {
                 ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`;
         });
-
         const insightColors = {
             warning: 'bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20 text-amber-800 dark:text-amber-300',
             success: 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-300',
@@ -442,19 +392,16 @@ const AppDashboard = {
             </div>`).join('');
         lucide.createIcons({ nodes: [content] });
     },
-
     _toggleHealthBreakdown() {
         const breakdown = document.getElementById('health-breakdown');
         const icon = document.getElementById('health-toggle-icon');
         const text = document.getElementById('health-toggle-text');
-        
         if (breakdown && icon && text) {
             breakdown.classList.toggle('hidden');
             icon.classList.toggle('rotate-180');
             text.textContent = breakdown.classList.contains('hidden') ? 'View Breakdown' : 'Hide Breakdown';
         }
     },
-
     getHealthExplanation(calc) {
         const components = [
             { 
@@ -530,12 +477,10 @@ const AppDashboard = {
                     : '⚠ Net worth not growing. Focus on saving'
             }
         ];
-
         return components.map(item => {
             const pct = (item.score / item.max) * 100;
             const color = pct >= 75 ? 'text-emerald-600 dark:text-emerald-400' : pct >= 50 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400';
             const barColor = pct >= 75 ? 'bg-emerald-500' : pct >= 50 ? 'bg-amber-500' : 'bg-rose-500';
-            
             return `
             <div class="space-y-1">
                 <div class="flex items-center justify-between text-xs">

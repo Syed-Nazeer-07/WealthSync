@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WealthSync - Personal Financial OS</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
     <script>
         // Apply theme before paint to avoid flash
         if (localStorage.getItem('theme') !== 'light') {
@@ -11,7 +12,7 @@
         }
     </script>
     
-    <!-- Tailwind CSS with Custom Config -->
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -52,23 +53,23 @@
         }
     </script>
 
-    <!-- Google Fonts -->
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Lucide Icons -->
+    
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Chart.js -->
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body class="bg-slate-50 text-slate-800 dark:bg-dark-bg dark:text-slate-200 transition-colors duration-300 antialiased min-h-screen flex overflow-hidden selection:bg-brand-500 selection:text-white">
 
-    <!-- Sidebar Navigation -->
+    
     <aside id="sidebar" class="sidebar fixed md:static inset-y-0 left-0 z-40 flex flex-col h-screen bg-white dark:bg-dark-card border-r border-slate-200 dark:border-dark-border overflow-hidden">
 
-        <!-- Header: Logo -->
+        
         <div class="sidebar-header flex items-center border-b border-slate-100 dark:border-dark-border/50 shrink-0">
             <button onclick="App.setActiveTab('dashboard')" class="sidebar-logo-btn flex items-center gap-3 min-w-0 flex-1 hover:opacity-80 transition-opacity" title="Dashboard">
                 <div class="shrink-0 w-11 h-11 rounded-xl overflow-hidden flex items-center justify-center bg-white">
@@ -76,23 +77,23 @@
                 </div>
                 <span class="sidebar-text font-bold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-400">WealthSync</span>
             </button>
-            <!-- Collapsed-state icon-only logo -->
+            
             <button onclick="App.setActiveTab('dashboard')" class="sidebar-logo-icon hidden shrink-0 w-11 h-11 rounded-xl overflow-hidden hover:opacity-80 transition-opacity" title="Dashboard">
                 <img src="/static/logo.png" alt="WealthSync" class="w-full h-full object-cover">
             </button>
         </div>
 
-        <!-- Navigation -->
+        
         <div class="flex-1 overflow-y-auto overflow-x-hidden py-4">
             <p class="sidebar-section-label px-3 mb-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Overview</p>
             <nav id="nav-menu" class="space-y-0.5 px-2">
-                <!-- injected by JS -->
+                
             </nav>
         </div>
 
-        <!-- Footer: User -->
+        
         <div class="sidebar-footer border-t border-slate-100 dark:border-dark-border/50 shrink-0">
-            <!-- User row -->
+            
             <div class="flex items-center gap-2 p-3">
                 <div class="shrink-0 w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-300 ring-2 ring-white dark:ring-dark-bg">
                     <i data-lucide="user" class="w-4 h-4"></i>
@@ -113,17 +114,17 @@
         </div>
     </aside>
 
-    <!-- Floating sidebar toggle (desktop only) -->
+    
     <button id="sidebar-chevron" onclick="App.toggleSidebar()" class="hidden md:flex fixed z-50 items-center justify-center w-6 h-6 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-md text-slate-500 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 hover:border-brand-400 transition-all" style="top: 32px;" title="Toggle sidebar">
         <i data-lucide="chevron-left" id="sidebar-chevron-icon" class="w-3.5 h-3.5 transition-transform"></i>
     </button>
 
-    <!-- Mobile overlay -->
+    
     <div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-30 hidden transition-opacity" onclick="App.closeMobileSidebar()"></div>
 
-    <!-- Main Content Area -->
+    
     <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
-        <!-- Mobile Header -->
+        
         <header class="md:hidden glass z-20 px-4 py-4 flex justify-between items-center sticky top-0 border-b border-slate-200 dark:border-dark-border">
             <div class="flex items-center gap-2">
                 <div class="w-8 h-8 rounded-lg overflow-hidden shadow">
@@ -141,13 +142,13 @@
             </div>
         </header>
 
-        <!-- Dynamic Content injected here -->
+        
         <div id="main-content" class="flex-1 overflow-y-auto p-4 sm:p-8 lg:p-10 scroll-smooth">
-            <!-- Content -->
+            
         </div>
     </main>
 
-    <!-- Modal Container -->
+    
     <div id="modal-container"></div>
 
     <script src="/static/js/ui.js"></script>

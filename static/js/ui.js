@@ -1,8 +1,6 @@
-// ─── Toast ────────────────────────────────────────────────────────────────────
 
 const Toast = (() => {
     let container;
-
     function getContainer() {
         if (!container) {
             container = document.createElement('div');
@@ -12,14 +10,12 @@ const Toast = (() => {
         }
         return container;
     }
-
     const STYLES = {
         success: { bar: 'bg-emerald-500', icon: 'check-circle',   text: 'text-emerald-700 dark:text-emerald-300', bg: 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-500/30' },
         error:   { bar: 'bg-rose-500',    icon: 'x-circle',       text: 'text-rose-700 dark:text-rose-300',       bg: 'bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-500/30' },
         warning: { bar: 'bg-amber-500',   icon: 'alert-triangle',  text: 'text-amber-700 dark:text-amber-300',     bg: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-500/30' },
         info:    { bar: 'bg-brand-500',   icon: 'info',            text: 'text-brand-700 dark:text-brand-300',     bg: 'bg-brand-50 dark:bg-brand-900/20 border-brand-200 dark:border-brand-500/30' },
     };
-
     function show(message, type = 'info', duration = 3000) {
         const s = STYLES[type] || STYLES.info;
         const el = document.createElement('div');
@@ -31,18 +27,12 @@ const Toast = (() => {
         `;
         getContainer().appendChild(el);
         lucide.createIcons({ nodes: [el] });
-
-        // Animate in
         requestAnimationFrame(() => requestAnimationFrame(() => {
             el.classList.remove('translate-x-full', 'opacity-0');
         }));
-
-        // Progress bar
         const bar = el.querySelector('.toast-progress');
         bar.style.transition = `width ${duration}ms linear`;
         requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.width = '0%'; }));
-
-        // Animate out and remove
         const dismiss = () => {
             el.classList.add('translate-x-full', 'opacity-0');
             el.addEventListener('transitionend', () => el.remove(), { once: true });
@@ -50,13 +40,8 @@ const Toast = (() => {
         const timer = setTimeout(dismiss, duration);
         el.addEventListener('click', () => { clearTimeout(timer); dismiss(); });
     }
-
     return { show };
 })();
-
-
-// ─── Confirmation Modal ───────────────────────────────────────────────────────
-
 const ConfirmModal = (() => {
     function show({ title, message, confirmLabel = 'Confirm', onConfirm }) {
         const overlay = document.createElement('div');
@@ -78,12 +63,10 @@ const ConfirmModal = (() => {
         `;
         document.body.appendChild(overlay);
         lucide.createIcons({ nodes: [overlay] });
-
         const close = () => overlay.remove();
         overlay.querySelector('#confirm-cancel').addEventListener('click', close);
         overlay.querySelector('#confirm-ok').addEventListener('click', () => { close(); onConfirm(); });
         overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
     }
-
     return { show };
 })();

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Migration script to add default categories to existing users"""
 
 from app import app, db, User, Category
@@ -17,7 +16,6 @@ DEFAULT_CATEGORIES = [
 with app.app_context():
     users = User.query.all()
     for user in users:
-        # Check if user already has categories
         existing = Category.query.filter_by(user_id=user.id).count()
         if existing == 0:
             print(f"Adding categories for user {user.email}...")

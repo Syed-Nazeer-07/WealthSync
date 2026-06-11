@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Add account_mode column to existing profiles"""
 
 import sqlite3
@@ -7,7 +6,6 @@ try:
     conn = sqlite3.connect('instance/wealthsync.db')
     cursor = conn.cursor()
     
-    # Check if column exists
     cursor.execute("PRAGMA table_info(profile)")
     columns = [col[1] for col in cursor.fetchall()]
     

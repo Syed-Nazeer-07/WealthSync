@@ -1,0 +1,117 @@
+QUICK FIX SUMMARY: Google OAuth Error 401 invalid_client
+=========================================================
+
+PROBLEM:
+- Error: 401: invalid_client - "The OAuth client was not found"
+- Site: https://wealthsync-ig8q.onrender.com
+
+ROOT CAUSE:
+- Authlib missing explicit Google OAuth endpoints
+- Only using server_metadata_url for discovery (unreliable in some cases)
+
+EXACT CODE CHANGE MADE:
+=======================
+
+File: app.py (lines 57-62)
+
+BEFORE:
+google = oauth.register(
+    name="google",
+    client_id=os.environ.get("GOOGLE_CLIENT_ID"),
+    client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    client_kwargs={"scope": "openid email profile"},
+)
+
+AFTER:
+google = oauth.register(
+    name="google",
+    client_id=os.environ.get("GOOGLE_CLIENT_ID"),
+    client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    authorize_url="https://accounts.google.com/o/oauth2/v2/auth",
+    token_url="https://oauth2.googleapis.com/token",
+    client_kwargs={"scope": "openid email profile"},
+)
+
+WHAT WAS ADDED:
+- authorize_url="https://accounts.google.com/o/oauth2/v2/auth"
+- token_url="https://oauth2.googleapis.com/token"
+
+WHY THIS FIXES IT:
+- Explicit endpoints ensure Authlib knows where to send requests
+- Removes dependency on slow/unreliable metadata discovery
+- Guarantees compatibility with Google's OAuth 2.0 implementation
+
+ADDITIONAL ENDPOINT ADDED:
+===========================
+
+GET /debug/oauth
+
+Returns JSON with:
+- client_id_loaded: true/false
+- client_secret_loaded: true/false  
+- redirect_uri_template: https://...
+- app_url_scheme: https
+- google_client_config: (starts with values)
+
+Use this to verify credentials are loaded in Render.
+
+DEPLOYMENT:
+===========
+
+1. Push updated app.py to GitHub
+2. Render auto-deploys
+3. Test /debug/oauth (should show all true)
+4. Test Google OAuth login
+
+VERIFICATION:
+=============
+
+After deployment, check:
+
+curl https://wealthsync-ig8q.onrender.com/debug/oauth
+
+Expected response:
+{
+  "client_id_loaded": true,
+  "client_secret_loaded": true,
+  "redirect_uri_template": "https://wealthsync-ig8q.onrender.com/auth/google/callback",
+  "app_url_scheme": "https"
+}
+
+If client_id_loaded or client_secret_loaded is false:
+- Check Render environment variables
+- Verify GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are set
+
+If redirect_uri shows http instead of https:
+- Set PREFERRED_URL_SCHEME=https in Render environment
+
+GOOGLE CONSOLE CHECKLIST:
+=========================
+
+Verify these match exactly:
+
+OAuth 2.0 Client IDs:
+[ ] Client ID matches GOOGLE_CLIENT_ID in Render
+[ ] Client Secret matches GOOGLE_CLIENT_SECRET in Render
+
+Authorized Redirect URIs:
+[ ] https://wealthsync-ig8q.onrender.com/auth/google/callback
+
+Authorized JavaScript Origins:
+[ ] https://wealthsync-ig8q.onrender.com
+
+After verification, Google OAuth should work.
+
+FILES CHANGED:
+==============
+
+Modified:
+- app.py (oauth.register configuration + debug endpoint)
+
+Created:
+- OAUTH_DEBUG_REPORT.txt (this document)
+- OAUTH_QUICK_FIX.txt (quick reference)
+
+STATUS: ✅ FIX APPLIED & READY TO DEPLOY

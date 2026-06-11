@@ -7,13 +7,10 @@ const App = {
         modal: { isOpen: false, type: null, entityId: null },
         txFormType: 'expense',
         charts: {},
-
         txSearchQuery: '',
         txFilterCategory: '',
-
         roadmap: [],
         categories: [],
-
         transactions: [],
         txLoading: false,
         txError: null,
@@ -24,11 +21,7 @@ const App = {
         savings: [],
         goalForecasts: [],
         investments: [],
-
     },
-
-    // --- Initialization & Theme ---
-
     init() {
         if (this.state.darkMode) {
             document.documentElement.classList.add('dark');
@@ -39,19 +32,15 @@ const App = {
         this._applySidebarCollapsed();
         this.renderSidebarMenu();
         this.fetchCurrentUser();
-
-        // ESC closes mobile sidebar
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape' && this.state.isMobileMenuOpen) this.closeMobileSidebar();
         });
     },
-
     toggleSidebar() {
         this.state.sidebarCollapsed = !this.state.sidebarCollapsed;
         localStorage.setItem('sidebarCollapsed', this.state.sidebarCollapsed);
         this._applySidebarCollapsed();
     },
-
     _applySidebarCollapsed() {
         const sidebar = document.getElementById('sidebar');
         if (!sidebar) return;
@@ -68,7 +57,6 @@ const App = {
         }
         if (chevron) lucide.createIcons({ nodes: [chevron] });
     },
-
     async fetchCurrentUser() {
         const res = await fetch('/api/auth/me');
         if (res.status === 401) { window.location.href = '/login'; return; }
@@ -82,31 +70,25 @@ const App = {
                 ? 'text-xs text-emerald-500 dark:text-emerald-400'
                 : 'text-xs text-amber-500 dark:text-amber-400';
         }
-
         const profileRes = await fetch('/api/profile');
         if (profileRes.ok) {
             const profile = await profileRes.json();
             this.state.profile = profile;
             if (!profile.onboarding_completed) { window.location.href = '/onboarding'; return; }
         }
-
-        // Load persisted settings and apply them
         const settingsRes = await fetch('/api/settings');
         if (settingsRes.ok) {
             const settings = await settingsRes.json();
             this.state.settings = settings;
-            // Apply theme from DB (overrides localStorage)
             this.state.darkMode = settings.theme === 'dark';
             if (this.state.darkMode) document.documentElement.classList.add('dark');
             else document.documentElement.classList.remove('dark');
             localStorage.setItem('theme', settings.theme);
             this.updateThemeIcons();
-            // Apply sidebar default from DB
             this.state.sidebarCollapsed = settings.sidebar_collapsed;
             localStorage.setItem('sidebarCollapsed', settings.sidebar_collapsed);
             this._applySidebarCollapsed();
         }
-
         this.fetchTransactions();
         this.fetchCategories();
         this.fetchBudgets();
@@ -114,7 +96,6 @@ const App = {
         this.fetchGoalForecasts();
         this.fetchInvestments();
     },
-
     async fetchCategories() {
         const res = await fetch('/api/categories');
         if (res.ok) {
@@ -122,7 +103,6 @@ const App = {
             this.render();
         }
     },
-
     async fetchBudgets() {
         const res = await fetch('/api/budgets');
         if (res.ok) {
@@ -130,7 +110,6 @@ const App = {
             this.render();
         }
     },
-
     async fetchGoals() {
         const res = await fetch('/api/goals');
         if (res.ok) {
@@ -139,7 +118,6 @@ const App = {
             this.render();
         }
     },
-
     async fetchGoalForecasts() {
         const res = await fetch('/api/goals/forecast');
         if (res.ok) {
@@ -147,7 +125,6 @@ const App = {
             this.render();
         }
     },
-
     async fetchInvestments() {
         const res = await fetch('/api/investments');
         if (res.ok) {
@@ -155,12 +132,10 @@ const App = {
             this.render();
         }
     },
-
     async logout() {
         await fetch('/api/auth/logout', { method: 'POST' });
         window.location.href = '/login';
     },
-
     async fetchTransactions() {
         this.state.txLoading = true;
         this.state.txError = null;
@@ -177,12 +152,10 @@ const App = {
             this.render();
         }
     },
-
     toggleTheme() {
         const newTheme = this.state.darkMode ? 'light' : 'dark';
         this.saveSetting('theme', newTheme);
     },
-
     updateThemeIcons() {
         const iconStr = this.state.darkMode ? 'sun' : 'moon';
         const deskIcon = document.getElementById('theme-icon');
@@ -191,20 +164,14 @@ const App = {
         if (mobIcon) mobIcon.setAttribute('data-lucide', iconStr);
         lucide.createIcons();
     },
-
-    // --- Formatting Utilities ---
-
-    // Derive currency symbol from ISO code — no reliance on currency_symbol field
     getCurrencySymbol() {
         const SYMBOLS = { INR: '₹', USD: '$', EUR: '€', GBP: '£', AED: 'د.إ', SGD: 'S$' };
         return SYMBOLS[this.state.settings?.currency] || '₹';
     },
-
     getCurrencyLocale() {
         const LOCALES = { INR: 'en-IN', USD: 'en-US', EUR: 'de-DE', GBP: 'en-GB', AED: 'ar-AE', SGD: 'en-SG' };
         return LOCALES[this.state.settings?.currency] || 'en-IN';
     },
-
     formatCurrency(amount) {
         const s = this.state.settings;
         return new Intl.NumberFormat(this.getCurrencyLocale(), {
@@ -213,18 +180,13 @@ const App = {
             maximumFractionDigits: 0
         }).format(amount);
     },
-
     getCategoryNames() {
         return this.state.categories.map(c => c.name);
     },
-
     getCategoryEmoji(name) {
         const cat = this.state.categories.find(c => c.name === name);
         return cat ? cat.emoji : '📦';
     },
-
-    // Returns the decimal and grouping separator characters for the current locale.
-    // Cached on first call since locale doesn't change mid-session.
     _getSeparators() {
         if (this._sepCache) return this._sepCache;
         const parts = new Intl.NumberFormat(this.getCurrencyLocale()).formatToParts(1234567.89);
@@ -233,49 +195,32 @@ const App = {
         this._sepCache = { decimal, group };
         return this._sepCache;
     },
-
-    // Parse a locale-formatted string back to a plain JS number.
     _parseMoney(str) {
         const { decimal, group } = this._getSeparators();
-        // Escape special regex chars in separator chars
         const groupRe = new RegExp('\\' + group, 'g');
         const clean = str.replace(groupRe, '').replace(decimal, '.');
         return parseFloat(clean);
     },
-
-    // Format a raw number using selected locale (no symbol), used when pre-filling fields.
     formatMoneyInput(value) {
         const n = typeof value === 'string' ? this._parseMoney(value) : value;
         if (isNaN(n) || value === '' || value === '-') return String(value);
         return new Intl.NumberFormat(this.getCurrencyLocale(), { maximumFractionDigits: 2 }).format(n);
     },
-
-    // Live formatter for money text inputs — locale-safe, preserves cursor position.
     handleMoneyInput(e) {
         const input = e.target;
         const { decimal } = this._getSeparators();
         const raw = input.value;
-
-        // Allow in-progress states: empty, minus sign, trailing decimal, trailing decimal+zeros
         const decEsc = decimal === '.' ? '\\.' : decimal;
         if (!raw || raw === '-' || new RegExp(`^-?\\d*${decEsc}\\d*$`).test(raw.replace(new RegExp('\\' + (decimal === '.' ? ',' : '.'), 'g'), ''))) {
-            // Only reformat if the value is complete (has no trailing decimal/zero edge case)
             if (raw.endsWith(decimal) || raw.endsWith(decimal + '0') || raw === '-') return;
         }
-
         const num = this._parseMoney(raw);
-        if (isNaN(num)) { return; } // don't clobber partial input
-
-        // Count digits-only chars after cursor to reposition after reformatting
+        if (isNaN(num)) { return; } 
         const pos = input.selectionStart;
         const charsAfterCursor = raw.slice(pos).replace(/\D/g, '').length;
-
         const formatted = new Intl.NumberFormat(this.getCurrencyLocale(), { maximumFractionDigits: 2 }).format(num);
-        if (formatted === raw) return; // no change needed
-
+        if (formatted === raw) return; 
         input.value = formatted;
-
-        // Reposition cursor: find position that has the same number of digits after it
         let digitsSeen = 0;
         let newPos = formatted.length;
         for (let i = formatted.length - 1; i >= 0; i--) {
@@ -285,111 +230,72 @@ const App = {
         }
         input.setSelectionRange(newPos, newPos);
     },
-
     formatDate(dateString) {
-        // dateString is always YYYY-MM-DD from the API.
-        // Parsing directly avoids UTC-midnight → local-day shift (the source of off-by-one bugs).
         const [y, m, d] = dateString.split('-').map(Number);
         return new Intl.DateTimeFormat(this.getCurrencyLocale(), {
             month: 'short', day: 'numeric', year: 'numeric',
             timeZone: this.state.settings?.timezone || 'UTC'
         }).format(new Date(y, m - 1, d));
     },
-
-    // --- Business Logic & Calculations ---
-
     getCalculations() {
         const p = this.state.profile || {};
         const isCashFlow = p.account_mode === 'cashflow';
-
-        // Transaction-derived figures (real ledger data)
         const txIncome   = this.state.transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + t.amount, 0);
         const txExpenses = this.state.transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + t.amount, 0);
-
-        // Profile-based figures (onboarding / user-declared)
         const totalSavings         = p.current_savings     ?? 0;
         const profileIncome        = p.monthly_income      ?? 0;
         const profileExpenses      = p.monthly_expenses    ?? 0;
-
-        // Calculate investment value from actual holdings, fallback to profile
         const totalInvestmentValue = this.state.investments.length
             ? this.state.investments.reduce((acc, inv) => acc + (inv.shares * inv.currentPrice), 0)
             : (p.current_investments ?? 0);
-
-        // Use transaction totals for cash flow; profile for balance-sheet items
         const totalIncome   = txIncome   || profileIncome;
         const totalExpenses = txExpenses || profileExpenses;
-        const currentCash   = txIncome - txExpenses;  // Always transaction-based
-
-        // Cash Flow Mode: Available Balance = transaction-based only
-        // Income Mode: Net Worth = transactions + savings + investments
+        const currentCash   = txIncome - txExpenses;  
         const availableBalance = currentCash;
         const netWorth = currentCash + totalSavings + totalInvestmentValue;
-
-        // Growth/change tracking
         const now = new Date();
         const thisYM  = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
         const lastDate = new Date(now.getFullYear(), now.getMonth()-1, 1);
         const lastYM  = `${lastDate.getFullYear()}-${String(lastDate.getMonth()+1).padStart(2,'0')}`;
-
         const txThisMonth = this.state.transactions.filter(t => t.date.startsWith(thisYM));
         const txLastMonth = this.state.transactions.filter(t => t.date.startsWith(lastYM));
-
         const netThisMonth = txThisMonth.reduce((s,t) => s + (t.type==='income' ? t.amount : -t.amount), 0);
         const netLastMonth = txLastMonth.reduce((s,t) => s + (t.type==='income' ? t.amount : -t.amount), 0);
-
         let netWorthGrowth = 0;
         if (netLastMonth !== 0) {
             netWorthGrowth = ((netThisMonth - netLastMonth) / Math.abs(netLastMonth)) * 100;
         } else if (netThisMonth > 0) {
             netWorthGrowth = 100;
         }
-
         const totalInvestmentCost = this.state.investments.length
             ? this.state.investments.reduce((acc, curr) => acc + (curr.shares * curr.avgCost), 0)
             : totalInvestmentValue * 0.85;
         const investmentProfit = totalInvestmentValue - totalInvestmentCost;
-
         const budgetProgress = this.state.budgets.map(budget => {
             const spent = this.state.transactions
                 .filter(t => t.type === 'expense' && t.category === budget.category)
                 .reduce((acc, curr) => acc + curr.amount, 0);
             return { ...budget, spent };
         });
-
-        // Mode-specific health scoring
         let healthScore, breakdown;
-        
         if (isCashFlow) {
-            // Cash Flow Mode: Focus on spending discipline, goal progress, balance trend
-            
-            // 1. Spending Discipline (0-30 pts): Are they staying within reasonable limits?
             let spendingScore = 15;
             if (txIncome > 0) {
                 const spendRate = txExpenses / txIncome;
                 spendingScore = spendRate <= 0.7 ? 30 : spendRate <= 0.85 ? 20 : spendRate <= 1.0 ? 10 : 5;
             }
-            
-            // 2. Budget Adherence (0-20 pts)
             let budgetScore = budgetProgress.length > 0
                 ? (budgetProgress.filter(b => b.spent <= b.limit).length / budgetProgress.length) * 20
                 : 10;
-            
-            // 3. Goal Progress (0-25 pts)
             let goalScore = 10;
             if (this.state.savings.length > 0) {
                 const avgProgress = this.state.savings.reduce((sum, g) => 
                     sum + Math.min(100, g.target > 0 ? (g.current / g.target) * 100 : 0), 0) / this.state.savings.length;
                 goalScore = (avgProgress / 100) * 25;
             }
-            
-            // 4. Balance Trend (0-15 pts): Is available balance growing?
             const trendScore = currentCash > 0 ? 15 : currentCash > -1000 ? 8 : 3;
-            
-            // 5. Transaction Consistency (0-10 pts): Regular tracking
             const txCount = this.state.transactions.length;
             const consistencyScore = Math.min(10, txCount / 5);
-            
             healthScore = Math.round(spendingScore + budgetScore + goalScore + trendScore + consistencyScore);
             breakdown = {
                 spendingScore: Math.round(spendingScore),
@@ -399,29 +305,22 @@ const App = {
                 consistencyScore: Math.round(consistencyScore)
             };
         } else {
-            // Income Mode: Original 7-component system
             const monthlyIncome = profileIncome || (txIncome / Math.max(1, this.state.transactions.length));
-            
             const savingsRate = totalSavings / (monthlyIncome * 12 || 1);
             const savingsRateScore = Math.min(20, savingsRate * 100);
-            
             const emergencyMonths = totalSavings / (profileExpenses || totalExpenses || 1);
             const emergencyFundScore = Math.min(20, (emergencyMonths / 6) * 20);
-            
             let budgetScore = budgetProgress.length > 0
                 ? (budgetProgress.filter(b => b.spent <= b.limit).length / budgetProgress.length) * 15
                 : 10;
-            
             let goalScore = 5;
             if (this.state.savings.length > 0) {
                 const avgProgress = this.state.savings.reduce((sum, g) => 
                     sum + Math.min(100, g.target > 0 ? (g.current / g.target) * 100 : 0), 0) / this.state.savings.length;
                 goalScore = (avgProgress / 100) * 15;
             }
-            
             const invRatio = totalSavings > 0 ? (totalInvestmentValue / totalSavings) : (totalInvestmentValue > 0 ? 1 : 0);
             const investmentScore = Math.min(15, invRatio * 15);
-            
             const monthlyExp = {};
             this.state.transactions.filter(t => t.type === 'expense').forEach(t => {
                 const ym = t.date.substring(0, 7);
@@ -436,9 +335,7 @@ const App = {
                 const cv = avgExp > 0 ? stdDev / avgExp : 1;
                 stabilityScore = Math.max(0, 10 * (1 - Math.min(1, cv)));
             }
-            
             const growthScore = netWorth > 0 ? 5 : 2;
-            
             healthScore = Math.round(savingsRateScore + emergencyFundScore + budgetScore + goalScore + investmentScore + stabilityScore + growthScore);
             breakdown = {
                 savingsRateScore: Math.round(savingsRateScore),
@@ -450,7 +347,6 @@ const App = {
                 growthScore: Math.round(growthScore)
             };
         }
-
         return {
             totalIncome, totalExpenses, currentCash, totalSavings,
             totalInvestmentValue, totalInvestmentCost, investmentProfit,
@@ -458,7 +354,6 @@ const App = {
             breakdown, isCashFlow
         };
     },
-
     getBadges() {
         const calc = this.getCalculations();
         const p = this.state.profile || {};
@@ -477,8 +372,6 @@ const App = {
             }
         ];
     },
-
-    // Returns today's YYYY-MM-DD in the user's saved timezone.
     _todayInTz() {
         const tz = this.state.settings?.timezone || 'UTC';
         const parts = new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
@@ -486,14 +379,11 @@ const App = {
         parts.forEach(x => { p[x.type] = x.value; });
         return `${p.year}-${p.month}-${p.day}`;
     },
-
-    // Subtract one calendar day from a YYYY-MM-DD string (timezone-independent arithmetic).
     _prevDay(dateStr) {
         const [y, m, d] = dateStr.split('-').map(Number);
         const dt = new Date(y, m - 1, d - 1);
         return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
     },
-
     getStreak() {
         const dates = new Set(this.state.transactions.map(t => t.date));
         let streak = 0;
@@ -504,24 +394,19 @@ const App = {
         }
         return streak;
     },
-
     getRuleBasedInsights() {
         const insights = [];
         const calc = this.getCalculations();
-
         if (calc.healthScore < 60) {
             insights.push({ type: 'danger', icon: 'alert-triangle', text: 'Financial health score is dropping. Priority: Reduce non-essential spending.' });
         }
-
         const overBudget = calc.budgetProgress.find(b => b.spent > b.limit);
         if (overBudget) {
             insights.push({ type: 'warning', icon: 'pie-chart', text: `You have exceeded your ${overBudget.category} budget by ${this.formatCurrency(overBudget.spent - overBudget.limit)}.` });
         }
-
         if (calc.totalSavings > 0 && calc.totalInvestmentValue === 0) {
             insights.push({ type: 'info', icon: 'trending-up', text: 'You have savings but no investments. Consider starting a systematic investment plan (SIP).' });
         }
-
         if (insights.length === 0) {
             const streak = this.getStreak();
             const streakText = streak > 0 ? ` Keep up the ${streak}-day activity streak!` : '';
@@ -529,64 +414,47 @@ const App = {
         }
         return insights;
     },
-
-    // Returns YYYY-MM prefix for the current month in user's timezone.
     _currentYM() {
         const today = this._todayInTz();
         return today.slice(0, 7);
     },
-
-    // Returns YYYY-MM prefix for last month in user's timezone.
     _lastYM() {
         const today = this._todayInTz();
         const [y, m] = today.split('-').map(Number);
         const prev = new Date(y, m - 2, 1);
         return `${prev.getFullYear()}-${String(prev.getMonth()+1).padStart(2,'0')}`;
     },
-
     getMonthlyReport() {
         const ym = this._currentYM();
         const lym = this._lastYM();
         const txThis = this.state.transactions.filter(t => t.date.startsWith(ym));
         const txLast = this.state.transactions.filter(t => t.date.startsWith(lym));
-
         const income   = txThis.filter(t => t.type === 'income').reduce((s,t) => s + t.amount, 0);
         const expenses = txThis.filter(t => t.type === 'expense').reduce((s,t) => s + t.amount, 0);
         const lastIncome   = txLast.filter(t => t.type === 'income').reduce((s,t) => s + t.amount, 0);
         const lastExpenses = txLast.filter(t => t.type === 'expense').reduce((s,t) => s + t.amount, 0);
-
         const savings = income - expenses;
         const savingsRate = income > 0 ? (savings / income) * 100 : 0;
         const netChange = savings - (lastIncome - lastExpenses);
-
-        // Category totals this month
         const catThis = {};
         txThis.filter(t => t.type === 'expense').forEach(t => { catThis[t.category] = (catThis[t.category] || 0) + t.amount; });
         const catLast = {};
         txLast.filter(t => t.type === 'expense').forEach(t => { catLast[t.category] = (catLast[t.category] || 0) + t.amount; });
-
         const topCat = Object.entries(catThis).sort((a,b) => b[1]-a[1])[0];
-
-        // Fastest growing: biggest absolute increase from last month
         let fastestCat = null, fastestGrowth = 0;
         Object.entries(catThis).forEach(([cat, amt]) => {
             const prev = catLast[cat] || 0;
             const growth = amt - prev;
             if (growth > fastestGrowth) { fastestGrowth = growth; fastestCat = cat; }
         });
-
-        // Grade: A(≥85) B(≥70) C(≥55) D(≥40) F(<40)
         const score = this.getCalculations().healthScore;
         const grade = score >= 85 ? 'A' : score >= 70 ? 'B' : score >= 55 ? 'C' : score >= 40 ? 'D' : 'F';
         const gradeColor = { A: 'text-emerald-500', B: 'text-brand-500', C: 'text-amber-500', D: 'text-orange-500', F: 'text-rose-500' }[grade];
-
         return { income, expenses, savings, savingsRate, netChange, topCat, fastestCat, fastestGrowth, grade, gradeColor, lastIncome, lastExpenses };
     },
-
     getSmartInsights(period = 'month') {
         const today = this._todayInTz();
         const [ty, tm, td] = today.split('-').map(Number);
-
         let startThis, startLast;
         if (period === 'week') {
             const thisMonday = new Date(ty, tm-1, td - ((new Date(ty,tm-1,td).getDay() + 6) % 7));
@@ -606,22 +474,16 @@ const App = {
             const lastDay = new Date(ty, tm-1, 0);
             var endLast  = `${prevM.getFullYear()}-${String(prevM.getMonth()+1).padStart(2,'0')}-${String(lastDay.getDate()).padStart(2,'0')}`;
         }
-
         const txThis = this.state.transactions.filter(t => t.date >= startThis && t.date <= today);
         const txLast = this.state.transactions.filter(t => t.date >= startLast && t.date <= endLast);
-
         const catThis = {}, catLast = {};
         txThis.filter(t => t.type==='expense').forEach(t => { catThis[t.category] = (catThis[t.category]||0) + t.amount; });
         txLast.filter(t => t.type==='expense').forEach(t => { catLast[t.category] = (catLast[t.category]||0) + t.amount; });
-
         const incThis = txThis.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
         const expThis = txThis.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
         const incLast = txLast.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
         const expLast = txLast.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
-
         const insights = [];
-
-        // Category spending changes
         const allCats = new Set([...Object.keys(catThis), ...Object.keys(catLast)]);
         allCats.forEach(cat => {
             const curr = catThis[cat] || 0;
@@ -630,7 +492,6 @@ const App = {
             const diff = curr - prev;
             const pct = prev > 0 ? Math.round((diff / prev) * 100) : null;
             if (Math.abs(diff) < 1) return;
-
             if (diff > 0) {
                 const label = pct !== null ? `(+${pct}%)` : '(new)';
                 insights.push({ type: 'warning', icon: 'trending-up',
@@ -641,8 +502,6 @@ const App = {
                     text: `${cat} spending decreased by ${this.formatCurrency(Math.abs(diff))} ${label}.` });
             }
         });
-
-        // Savings rate change
         const srThis = incThis > 0 ? ((incThis-expThis)/incThis*100) : null;
         const srLast = incLast > 0 ? ((incLast-expLast)/incLast*100) : null;
         if (srThis !== null && srLast !== null && Math.abs(srThis - srLast) >= 1) {
@@ -651,39 +510,29 @@ const App = {
             insights.push({ type: typ, icon: 'percent',
                 text: `Savings rate ${dir} from ${srLast.toFixed(0)}% to ${srThis.toFixed(0)}%.` });
         }
-
-        // Net worth change this period
         const netThis = incThis - expThis;
         if (netThis !== 0) {
             insights.push({ type: netThis > 0 ? 'success' : 'warning', icon: netThis > 0 ? 'arrow-up-circle' : 'arrow-down-circle',
                 text: `Net cash flow ${netThis > 0 ? 'positive' : 'negative'}: ${this.formatCurrency(Math.abs(netThis))} ${netThis > 0 ? 'gained' : 'spent more than earned'}.` });
         }
-
-        // Budget status
         const calc = this.getCalculations();
         const overBudgets = calc.budgetProgress.filter(b => b.spent > b.limit);
         if (overBudgets.length === 0 && calc.budgets?.length > 0) {
             insights.push({ type: 'success', icon: 'check-circle', text: 'You remained within all budgets this period.' });
         }
-
         if (insights.length === 0) {
             insights.push({ type: 'info', icon: 'info', text: 'Add transactions to see spending insights for this period.' });
         }
-
-        // Surface most impactful first: warnings before successes, bigger amounts first
         insights.sort((a, b) => {
             if (a.type === 'warning' && b.type !== 'warning') return -1;
             if (b.type === 'warning' && a.type !== 'warning') return 1;
             return 0;
         });
-
         return insights.slice(0, 6);
     },
-
     getGoalForecast(goalId) {
         return this.state.goalForecasts.find(f => f.goalId === goalId) || null;
     },
-
     getRecentActivity() {
         const today = this._todayInTz();
         const yesterday = this._prevDay(today);
@@ -698,9 +547,6 @@ const App = {
             });
         return groups;
     },
-
-    // --- UI Interactions ---
-
     setActiveTab(tab) {
         if (this.state.activeTab === tab) return;
         this.state.activeTab = tab;
@@ -711,17 +557,14 @@ const App = {
         }
         this.render();
     },
-
     toggleMobileMenu() {
         this.state.isMobileMenuOpen = !this.state.isMobileMenuOpen;
         this._updateMobileOverlay();
     },
-
     closeMobileSidebar() {
         this.state.isMobileMenuOpen = false;
         this._updateMobileOverlay();
     },
-
     _updateMobileOverlay() {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
@@ -737,21 +580,16 @@ const App = {
         }
         lucide.createIcons();
     },
-
-    // kept for back-compat call sites
     updateMobileSidebar() { this._updateMobileOverlay(); },
-
     handleTxSearch(e) {
         this.state.txSearchQuery = e.target.value;
         clearTimeout(this._txSearchTimer);
         this._txSearchTimer = setTimeout(() => this._renderTxTable(), 200);
     },
-
     handleTxFilter(e) {
         this.state.txFilterCategory = e.target.value;
         this._renderTxTable();
     },
-
     clearTxSearch() {
         this.state.txSearchQuery = '';
         const input = document.getElementById('tx-search-input');
@@ -760,20 +598,14 @@ const App = {
         if (clearBtn) clearBtn.classList.add('hidden');
         this._renderTxTable();
     },
-
-    // Surgically update only the table body + clear button — no full re-render
     _renderTxTable() {
         const tbody = document.getElementById('tx-table-body');
-        if (!tbody) return; // not on transactions tab
+        if (!tbody) return; 
         tbody.innerHTML = this._getTxRows();
         lucide.createIcons({ nodes: [tbody] });
-        // toggle clear button visibility
         const clearBtn = document.getElementById('tx-search-clear');
         if (clearBtn) clearBtn.classList.toggle('hidden', !this.state.txSearchQuery);
     },
-
-    // --- Settings Actions ---
-
     async saveSetting(key, value) {
         const res = await fetch('/api/settings', {
             method: 'PUT',
@@ -783,9 +615,7 @@ const App = {
         if (!res.ok) { Toast.show('Failed to save setting', 'error'); return; }
         const updated = await res.json();
         this.state.settings = updated;
-        // Invalidate separator cache when currency changes
         if (key === 'currency') this._sepCache = null;
-        // Apply side-effects immediately
         if (key === 'theme') {
             this.state.darkMode = value === 'dark';
             document.documentElement.classList.toggle('dark', this.state.darkMode);
@@ -799,7 +629,6 @@ const App = {
         }
         this.render();
     },
-
     async saveSettingName() {
         const name = (document.getElementById('settings-name')?.value || '').trim();
         if (!name) return;
@@ -816,7 +645,6 @@ const App = {
         Toast.show('Name updated', 'success');
         this.render();
     },
-
     async saveSettingPassword() {
         const cur = document.getElementById('settings-pw-current')?.value || '';
         const nw  = document.getElementById('settings-pw-new')?.value || '';
@@ -836,36 +664,29 @@ const App = {
         document.getElementById('settings-pw-current').value = '';
         document.getElementById('settings-pw-new').value = '';
     },
-
     async resendVerification() {
         const res = await fetch('/api/settings/resend-verification', { method: 'POST' });
         Toast.show(res.ok ? 'Verification email sent' : 'Failed to send', res.ok ? 'success' : 'error');
     },
-
     formatNumber(num) {
         return new Intl.NumberFormat(this.getCurrencyLocale(), { maximumFractionDigits: 0 }).format(num || 0);
     },
-
     async saveFinancialProfile() {
         const isCashFlow = this.state.profile?.account_mode === 'cashflow';
         const parseNum = (val) => parseFloat((val || '').replace(/,/g, '')) || 0;
-        
         const payload = {
             current_savings: parseNum(document.getElementById('profile-savings')?.value),
             current_investments: parseNum(document.getElementById('profile-investments')?.value),
             monthly_expenses: parseNum(document.getElementById('profile-expenses')?.value)
         };
-        
         if (!isCashFlow) {
             payload.monthly_income = parseNum(document.getElementById('profile-monthly-income')?.value);
         }
-        
         const res = await fetch('/api/profile', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        
         const err = document.getElementById('profile-save-err');
         if (!res.ok) {
             const data = await res.json();
@@ -875,16 +696,11 @@ const App = {
             }
             return;
         }
-        
         if (err) err.classList.add('hidden');
-        
-        // Update local state
         Object.assign(this.state.profile, payload);
-        
         Toast.show('Financial profile updated', 'success');
         this.render();
     },
-
     dangerAction(action) {
         const configs = {
             'clear-transactions':  { title: 'Delete All Transactions',    msg: 'This will permanently delete all your transaction records.' },
@@ -893,9 +709,7 @@ const App = {
         };
         const cfg = configs[action];
         if (!cfg) return;
-
         if (cfg.needsPassword && this.state.currentUser?.has_password) {
-            // Show password confirm modal
             const overlay = document.createElement('div');
             overlay.className = 'fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm fade-in';
             overlay.innerHTML = `
@@ -931,7 +745,6 @@ const App = {
                     const r = await fetch(`/api/danger/${action}`, { method: 'DELETE' });
                     if (!r.ok) { Toast.show('Action failed', 'error'); return; }
                     if (action === 'delete-account') { window.location.href = '/login'; return; }
-                    // Refresh all state
                     this.state.transactions = [];
                     this.state.budgets = [];
                     this.state.savings = [];
@@ -943,9 +756,6 @@ const App = {
             });
         }
     },
-
-    // --- Rendering ---
-
     renderSidebarMenu() {
         const navItems = [
             { id: 'dashboard',    label: 'Dashboard',       icon: 'layout-dashboard' },
@@ -953,10 +763,9 @@ const App = {
             { id: 'budgets',      label: 'Budgets & Alerts',icon: 'pie-chart' },
             { id: 'savings',      label: 'Goal Forecasting',icon: 'target' },
             { id: 'investments',  label: 'Portfolio',       icon: 'trending-up' },
-            null, // divider
+            null, 
             { id: 'settings',     label: 'Settings',        icon: 'settings' },
         ];
-
         document.getElementById('nav-menu').innerHTML = navItems.map(item => {
             if (!item) return `<div class="sidebar-section-divider mx-3 my-2 border-t border-slate-100 dark:border-dark-border"></div>`;
             const isActive = this.state.activeTab === item.id;
@@ -971,13 +780,9 @@ const App = {
                 <span class="sidebar-text">${item.label}</span>
             </button>`;
         }).join('');
-
         lucide.createIcons({ nodes: [document.getElementById('sidebar')] });
     },
-
     render() {
-        // Don't clobber the transactions DOM if the user has focus inside it
-        // (prevents async fetch callbacks from stealing focus mid-typing)
         if (this.state.activeTab === 'transactions' && !this.state.txLoading && !this.state.txError) {
             const focused = document.activeElement;
             const txContent = document.getElementById('tx-table-body');
@@ -986,24 +791,19 @@ const App = {
                 return;
             }
         }
-
         const content = document.getElementById('main-content');
-
         Object.values(this.state.charts).forEach(chart => chart.destroy());
         this.state.charts = {};
-
         if (this.state.txLoading) {
             content.innerHTML = `<div class="flex items-center justify-center h-full"><div class="text-slate-500 dark:text-slate-400 flex items-center gap-3"><i data-lucide="loader" class="w-5 h-5 animate-spin"></i> Loading transactions…</div></div>`;
             lucide.createIcons();
             return;
         }
-
         if (this.state.txError) {
             content.innerHTML = `<div class="flex items-center justify-center h-full"><div class="text-rose-500 flex flex-col items-center gap-3 text-center"><i data-lucide="wifi-off" class="w-8 h-8"></i><p class="font-semibold">Failed to load transactions</p><p class="text-sm text-slate-500 dark:text-slate-400">${this.state.txError}</p><button onclick="App.fetchTransactions()" class="mt-2 px-4 py-2 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition-colors">Retry</button></div></div>`;
             lucide.createIcons();
             return;
         }
-
         let html = '';
         switch (this.state.activeTab) {
             case 'dashboard':    html = this.getDashboardHTML(); break;
@@ -1013,18 +813,13 @@ const App = {
             case 'investments':  html = this.getInvestmentsHTML(); break;
             case 'settings':     html = this.getSettingsHTML(); break;
         }
-
         content.innerHTML = html;
         lucide.createIcons();
-
         setTimeout(async () => {
             if (this.state.activeTab === 'dashboard') await this.initDashboardCharts();
             if (this.state.activeTab === 'investments') this.initInvestmentCharts();
         }, 50);
     },
-
-    // --- Modals ---
-
     openModal(type, id = null) {
         this.state.modal = { isOpen: true, type, entityId: id };
         if (type === 'transaction') {
@@ -1037,12 +832,10 @@ const App = {
         }
         this.renderModal();
     },
-
     closeModal() {
         this.state.modal = { isOpen: false, type: null, entityId: null };
         this.renderModal();
     },
-
     setTxType(type) {
         this.state.txFormType = type;
         const expBtn = document.getElementById('btn-expense');
@@ -1055,13 +848,11 @@ const App = {
             expBtn.className = "py-2.5 rounded-xl text-sm font-bold border-2 transition-all border-slate-100 dark:border-slate-700 text-slate-500 dark:text-slate-400";
         }
     },
-
     async handleFormSubmit(event) {
         event.preventDefault();
         const fd = new FormData(event.target);
         const { type, entityId } = this.state.modal;
         const id = entityId || Date.now();
-
         if (type === 'transaction') {
             const payload = {
                 description: fd.get('description'),
@@ -1143,11 +934,9 @@ const App = {
                 this.state.roadmap.push(newItem);
             }
         }
-
         this.closeModal();
         this.render();
     },
-
     async deleteItem(type, id) {
         if (type === 'transaction') {
             ConfirmModal.show({
@@ -1194,9 +983,6 @@ const App = {
         }
         this.render();
     },
-
-    // --- Description Autocomplete ---
-
     _descGetSuggestions(query) {
         if (!query || query.length < 2) return [];
         const q = query.toLowerCase();
@@ -1207,7 +993,7 @@ const App = {
             const key = tx.description.trim();
             if (!key) return;
             freq[key] = (freq[key] || 0) + 1;
-            if (!(key in recent)) recent[key] = idx; // lower = more recent
+            if (!(key in recent)) recent[key] = idx; 
         });
         return Object.keys(freq)
             .filter(d => d.toLowerCase().includes(q))
@@ -1216,7 +1002,6 @@ const App = {
             .slice(0, 8)
             .map(x => x.d);
     },
-
     _descAutocomplete(e) {
         const input = e.target;
         const dropdown = document.getElementById('tx-desc-dropdown');
@@ -1229,7 +1014,6 @@ const App = {
         ).join('');
         dropdown.classList.remove('hidden');
     },
-
     _descSelect(e, value) {
         e.preventDefault();
         const input = document.getElementById('tx-desc-input');
@@ -1237,21 +1021,18 @@ const App = {
         const dropdown = document.getElementById('tx-desc-dropdown');
         if (dropdown) dropdown.classList.add('hidden');
     },
-
     _descHideDropdown() {
         setTimeout(() => {
             const dropdown = document.getElementById('tx-desc-dropdown');
             if (dropdown) dropdown.classList.add('hidden');
         }, 150);
     },
-
     renderModal() {
         const container = document.getElementById('modal-container');
         if (!this.state.modal.isOpen) {
             container.innerHTML = '';
             return;
         }
-
         const { type, entityId } = this.state.modal;
         let item = null;
         if (entityId) {
@@ -1260,13 +1041,10 @@ const App = {
             if (type === 'saving') item = this.state.savings.find(s => s.id === entityId);
             if (type === 'investment') item = this.state.investments.find(i => i.id === entityId);
         }
-
         const today = new Date().toISOString().split('T')[0];
         let modalTitle = entityId ? `Edit ${type.charAt(0).toUpperCase() + type.slice(1)}` : `Add ${type.charAt(0).toUpperCase() + type.slice(1)}`;
         if (type === 'roadmap') modalTitle = 'Customize Roadmap';
-
         let formHtml = '';
-
         if (type === 'transaction') {
             const catOptions = this.getCategoryNames().map(cat => `<option value="${cat}" ${item && item.category === cat ? 'selected' : ''}>${cat}</option>`).join('');
             const sym = this.getCurrencySymbol();
@@ -1408,11 +1186,9 @@ const App = {
                     <button type="button" onclick="App.deleteItem('roadmap', ${s.id})" class="text-rose-500 p-1 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                 </div>
             `).join('');
-
             if (this.state.roadmap.length === 0) {
                 stepsHtml = `<p class="text-sm text-slate-500 mb-4">No milestones yet. Add one below!</p>`;
             }
-
             formHtml = `
                 <div class="mb-6 max-h-48 overflow-y-auto pr-2">${stepsHtml}</div>
                 <div class="pt-4 border-t border-slate-200 dark:border-slate-700">
@@ -1434,7 +1210,6 @@ const App = {
                 </div>
             `;
         }
-
         container.innerHTML = `
             <div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity fade-in">
                 <div class="bg-white dark:bg-dark-card rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-800 w-full max-w-md slide-up overflow-hidden">
@@ -1457,12 +1232,9 @@ const App = {
         `;
         lucide.createIcons();
     },
-
-    // Category Management
     openCategoryModal(catId = null) {
         const cat = catId ? this.state.categories.find(c => c.id === catId) : null;
         const title = cat ? 'Edit Category' : 'New Category';
-        
         document.getElementById('modal-container').innerHTML = `
             <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
                 <div class="bg-white dark:bg-dark-card rounded-2xl shadow-2xl max-w-md w-full animate-scale-in">
@@ -1490,104 +1262,83 @@ const App = {
         `;
         lucide.createIcons();
     },
-
     async saveCategory(e, catId) {
         e.preventDefault();
         const name = document.getElementById('cat-name').value.trim();
         const emoji = document.getElementById('cat-emoji').value.trim();
         const err = document.getElementById('cat-error');
-
         const method = catId ? 'PUT' : 'POST';
         const url = catId ? `/api/categories/${catId}` : '/api/categories';
-        
         const res = await fetch(url, {
             method,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, emoji })
         });
         const data = await res.json();
-        
         if (!res.ok) {
             err.textContent = data.error;
             err.classList.remove('hidden');
             return;
         }
-        
         await this.fetchCategories();
         this.closeModal();
         Toast.show(catId ? 'Category updated' : 'Category created', 'success');
         this.render();
     },
-
     editCategory(catId) {
         this.openCategoryModal(catId);
     },
-
     async deleteCategory(catId) {
         if (!confirm('Delete this category? Make sure no transactions use it.')) return;
-        
         const res = await fetch(`/api/categories/${catId}`, { method: 'DELETE' });
         const data = await res.json();
-        
         if (!res.ok) {
             Toast.show(data.error || 'Failed to delete', 'error');
             return;
         }
-        
         await this.fetchCategories();
         Toast.show('Category deleted', 'success');
         this.render();
     },
-
     async switchAccountMode(mode) {
         const res = await fetch('/api/profile', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ account_mode: mode })
         });
-        
         if (!res.ok) {
             Toast.show('Failed to switch mode', 'error');
             return;
         }
-        
         this.state.profile.account_mode = mode;
         Toast.show(`Switched to ${mode === 'cashflow' ? 'Cash Flow' : 'Income'} Mode`, 'success');
         this.render();
     },
-
-    // Bulk selection functions
     selectedItems: { tx: [], budget: [], goal: [], investment: [] },
-
     toggleSelectAllTx() {
         const selectAll = document.getElementById('select-all-tx');
         const checkboxes = document.querySelectorAll('.tx-checkbox');
         checkboxes.forEach(cb => cb.checked = selectAll.checked);
         this.updateTxSelection();
     },
-
     updateTxSelection() {
         const checkboxes = document.querySelectorAll('.tx-checkbox:checked');
         this.selectedItems.tx = Array.from(checkboxes).map(cb => parseInt(cb.value));
         this.updateBulkActionBar('tx', 'transactions');
     },
-
     updateBulkActionBar(type, entityName) {
         const count = this.selectedItems[type].length;
         let bar = document.getElementById(`${type}-bulk-bar`);
-        
         if (count === 0) {
             if (bar) bar.remove();
             return;
         }
-        
         if (!bar) {
             bar = document.createElement('div');
             bar.id = `${type}-bulk-bar`;
             bar.className = 'fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-slate-900 dark:bg-slate-800 text-white px-6 py-3 rounded-xl shadow-lg flex items-center gap-4 z-50';
             document.body.appendChild(bar);
         }
-        
         bar.innerHTML = `
             <span class="font-medium">${count} ${entityName} selected</span>
             <button onclick="App.bulkDelete('${type}', '${entityName}')" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors">
@@ -1598,11 +1349,8 @@ const App = {
             </button>
         `;
     },
-
     async bulkDelete(type, entityName) {
         const count = this.selectedItems[type].length;
-        
-        // Show custom modal
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm';
         modal.innerHTML = `
@@ -1624,27 +1372,22 @@ const App = {
         `;
         document.body.appendChild(modal);
         lucide.createIcons({ nodes: [modal] });
-        
         const confirmed = await new Promise(resolve => {
             modal.querySelector('#confirm-delete').onclick = () => { modal.remove(); resolve(true); };
             modal.querySelector('#cancel-delete').onclick = () => { modal.remove(); resolve(false); };
         });
-        
         if (!confirmed) return;
-        
         const endpoints = {
             tx: '/api/transactions/',
             budget: '/api/budgets/',
             goal: '/api/goals/',
             investment: '/api/investments/'
         };
-        
         try {
             for (const id of this.selectedItems[type]) {
                 const res = await fetch(endpoints[type] + id, { method: 'DELETE' });
                 if (!res.ok) throw new Error('Failed to delete item');
             }
-            
             this.clearSelection(type);
             await this.fetchTransactions();
             Toast.show(`${count} ${entityName} deleted`, 'success');
@@ -1653,7 +1396,6 @@ const App = {
             Toast.show('Failed to delete items', 'error');
         }
     },
-
     clearSelection(type) {
         this.selectedItems[type] = [];
         const bar = document.getElementById(`${type}-bulk-bar`);
@@ -1663,13 +1405,9 @@ const App = {
         if (selectAll) selectAll.checked = false;
     }
 };
-
-// Mix in methods from the module files
 Object.assign(App, AppDashboard);
 Object.assign(App, AppViews);
 Object.assign(App, AppCharts);
-
-// Boot
 document.addEventListener('DOMContentLoaded', () => {
     App.init();
 });

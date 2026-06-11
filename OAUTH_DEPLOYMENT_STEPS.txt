@@ -1,0 +1,120 @@
+GOOGLE OAUTH FIX - DEPLOYMENT STEPS
+===================================
+
+SITUATION:
+- Error: 401: invalid_client when attempting Google OAuth login
+- Site: https://wealthsync-ig8q.onrender.com
+- Cause: Missing explicit Google OAuth endpoints in Authlib configuration
+
+WHAT WAS FIXED:
+===============
+
+File: app.py, lines 57-62
+
+The OAuth registration now includes explicit Google OAuth endpoints:
+✓ authorize_url="https://accounts.google.com/o/oauth2/v2/auth"
+✓ token_url="https://oauth2.googleapis.com/token"
+
+These ensure Authlib always knows where to send OAuth requests.
+
+NEW DEBUG ENDPOINT:
+===================
+
+GET /debug/oauth
+
+Shows:
+- Whether GOOGLE_CLIENT_ID is loaded
+- Whether GOOGLE_CLIENT_SECRET is loaded
+- What redirect URI the app will use
+- App URL scheme (should be https)
+
+DEPLOYMENT PROCEDURE:
+====================
+
+Step 1: Push to GitHub
+  git add app.py
+  git commit -m "Fix: Add explicit Google OAuth endpoints to Authlib"
+  git push origin main
+
+Step 2: Render Auto-Deploys
+  - Watch Render dashboard for build completion
+  - Should complete in 1-2 minutes
+
+Step 3: Verify Deployment
+  curl https://wealthsync-ig8q.onrender.com/debug/oauth
+
+  Expected response:
+  {
+    "client_id_loaded": true,
+    "client_secret_loaded": true,
+    "redirect_uri_template": "https://wealthsync-ig8q.onrender.com/auth/google/callback",
+    "app_url_scheme": "https"
+  }
+
+Step 4: If credentials not loaded (false):
+  - Go to Render Dashboard
+  - Settings → Environment
+  - Verify GOOGLE_CLIENT_ID is set
+  - Verify GOOGLE_CLIENT_SECRET is set
+  - Click "Deploy" to restart with env vars
+
+Step 5: Test Google OAuth
+  1. Go to https://wealthsync-ig8q.onrender.com/login
+  2. Click "Login with Google"
+  3. Should redirect to Google consent screen
+  4. After approval, should log in successfully
+
+TROUBLESHOOTING:
+================
+
+If still getting "invalid_client":
+
+1. Check /debug/oauth endpoint shows both credentials loaded
+2. Verify Google Cloud Console has exact callback URL:
+   https://wealthsync-ig8q.onrender.com/auth/google/callback
+3. Verify Client ID and Secret match Google Console
+4. Check Render logs for detailed error messages
+
+To check logs:
+  - Render Dashboard → Select Service → Logs
+  - Watch for OAuth error messages
+
+Common issues:
+- Callback URL has trailing slash (should not)
+- Callback URL uses http instead of https
+- GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET not set in Render
+
+ROLLBACK (if needed):
+====================
+
+If deployment breaks anything:
+  git revert HEAD
+  git push origin main
+
+Render will automatically deploy the previous version.
+
+TESTING CHECKLIST:
+==================
+
+After deployment:
+[ ] /debug/oauth returns client_id_loaded: true
+[ ] /debug/oauth returns client_secret_loaded: true
+[ ] Google OAuth login button works
+[ ] Redirects to Google consent screen
+[ ] Returns to app after approval
+[ ] User is logged in
+[ ] No errors in Render logs
+
+MONITORING:
+===========
+
+After fix is deployed:
+- Monitor Render logs for OAuth errors
+- Check Google OAuth login success rate
+- Use /debug/oauth as ongoing verification
+
+If issues persist:
+- Check exact error in Render logs
+- Verify environment variables in Render dashboard
+- Verify Google Cloud Console OAuth settings
+

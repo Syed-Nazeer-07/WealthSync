@@ -9,3 +9,10 @@ __pycache__/
 .DS_Store
 .vscode/
 .idea/
+venv/
+__pycache__/
+instance/
+.env
+.env.save
+flask.log
+*.pyc

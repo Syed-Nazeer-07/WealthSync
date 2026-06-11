@@ -1,21 +1,17 @@
-// Chart initialization methods — attached to App at runtime via app.js
 
 const AppCharts = {
     async initDashboardCharts() {
         const isDark = this.state.darkMode;
         const textColor = isDark ? '#94a3b8' : '#64748b';
         const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
-
         const nwCtx = document.getElementById('netWorthChart');
         if (nwCtx) {
-            // Fetch real net-worth history from backend
             let nwLabels = ['Jan','Feb','Mar','Apr','May','Jun'];
             let nwData   = [0,0,0,0,0,0];
             try {
                 const res = await fetch('/api/net-worth-history');
                 if (res.ok) { const d = await res.json(); nwLabels = d.labels; nwData = d.data; }
             } catch(e) {}
-
             this.state.charts.nw = new Chart(nwCtx, {
                 type: 'line',
                 data: {
@@ -54,13 +50,11 @@ const AppCharts = {
                 }
             });
         }
-
         const expCtx = document.getElementById('expenseChart');
         if (expCtx) {
             const expenses = this.state.transactions.filter(t => t.type === 'expense');
             const categoryTotals = {};
             expenses.forEach(e => { categoryTotals[e.category] = (categoryTotals[e.category] || 0) + e.amount; });
-
             this.state.charts.exp = new Chart(expCtx, {
                 type: 'doughnut',
                 data: {
@@ -84,19 +78,15 @@ const AppCharts = {
             });
         }
     },
-
     initInvestmentCharts() {
         const ctx = document.getElementById('allocationChart');
         if (!ctx) return;
-
         const allocTotals = {};
         this.state.investments.forEach(inv => {
             const value = inv.shares * inv.currentPrice;
             allocTotals[inv.type] = (allocTotals[inv.type] || 0) + value;
         });
-
         const isDark = this.state.darkMode;
-
         this.state.charts.invAlloc = new Chart(ctx, {
             type: 'doughnut',
             data: {

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WealthSync – Sign In</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -73,10 +74,10 @@
 </head>
 <body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen flex">
 
-    <!-- Left Panel - Hero -->
+    
     <div class="hidden lg:flex lg:w-1/2 gradient-bg relative items-center justify-center p-12">
         <div class="text-center space-y-8 max-w-md">
-            <!-- Logo -->
+            
             <div class="flex justify-center mb-8">
                 <div class="w-20 h-20 rounded-2xl overflow-hidden shadow-xl bg-white p-2">
                     <img src="/static/logo.png" alt="WealthSync" class="w-full h-full object-cover">
@@ -105,18 +106,18 @@
         </div>
     </div>
 
-    <!-- Right Panel - Forms -->
+    
     <div class="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div class="w-full max-w-md space-y-8">
             
-            <!-- Mobile Logo -->
+            
             <div class="lg:hidden flex justify-center">
                 <div class="w-16 h-16 rounded-xl overflow-hidden shadow-lg bg-white p-2">
                     <img src="/static/logo.png" alt="WealthSync" class="w-full h-full object-cover">
                 </div>
             </div>
 
-            <!-- Tab Headers -->
+            
             <div class="text-center space-y-2">
                 <h2 class="text-3xl font-bold text-slate-800">Welcome back</h2>
                 <p class="text-slate-600">Sign in to your account to continue</p>
@@ -127,7 +128,7 @@
                 <button onclick="showTab('signup')" id="tab-signup" class="flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all text-slate-600 hover:text-slate-800">Sign Up</button>
             </div>
 
-            <!-- Sign In Form -->
+            
             <div id="form-signin" class="space-y-6">
                 <div class="field">
                     <input id="signin-email" type="email" placeholder=" " autocomplete="email" class="w-full px-4 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none transition-all">
@@ -166,7 +167,7 @@
                 </button>
             </div>
 
-            <!-- Sign Up Form -->
+            
             <div id="form-signup" class="space-y-6 hidden">
                 <div class="field">
                     <input id="signup-name" type="text" placeholder=" " autocomplete="name" class="w-full px-4 border border-slate-300 rounded-xl bg-white text-slate-800 focus:outline-none transition-all">
@@ -209,7 +210,7 @@
                 </p>
             </div>
 
-            <!-- Error Message -->
+            
             <div id="error-msg" class="hidden p-4 bg-red-50 border border-red-200 rounded-xl">
                 <div class="flex items-center gap-2 text-red-700 text-sm font-medium">
                     <i data-lucide="alert-circle" class="w-4 h-4"></i>
