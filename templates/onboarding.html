@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WealthSync – Setup</title>
-    <link rel="shortcut icon" href="{{ url_for('static', filename='logo.png') }}">
-    <link rel="icon" type="image/png" sizes="any" href="{{ url_for('static', filename='logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -58,7 +57,7 @@
         .confetti-piece { position: absolute; width: 8px; height: 8px; border-radius: 2px; animation: confetti 1s ease-out both; }
     </style>
 </head>
-<body class="bg-white text-slate-900 min-h-screen flex items-center justify-center p-4 sm:p-8 relative overflow-hidden">
+<body class="bg-white text-slate-600 min-h-screen flex items-center justify-center p-4 sm:p-8 relative overflow-hidden">
 
     
     <div class="fixed -top-40 -left-40 w-[600px] h-[600px] bg-brand-600/10 rounded-full blur-[140px] pointer-events-none animate-pulse-slow"></div>
@@ -70,11 +69,7 @@
         <div class="flex items-center justify-between mb-8">
             
             <div class="flex items-center gap-2.5">
-                <div class="p-2 bg-gradient-to-br from-brand-500 to-indigo-600 rounded-xl text-slate-900 shadow-lg shadow-brand-500/30">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                    </svg>
-                </div>
+                <img src="/static/logo.png" alt="WealthSync" class="w-10 h-10 rounded-lg">
                 <span class="font-bold text-lg text-slate-900">WealthSync</span>
             </div>
 
@@ -94,7 +89,7 @@
             <div id="step-1" class="step-enter">
                 <div class="mb-2 text-xs font-semibold text-brand-400 uppercase tracking-widest">Step 1 of 6</div>
                 <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 leading-tight">How do you manage<br>your finances?</h2>
-                <p class="text-slate-700 mb-8 text-base">Choose the mode that best fits your financial lifestyle.</p>
+                <p class="text-slate-600 mb-8 text-base">Choose the mode that best fits your financial lifestyle.</p>
                 
                 <div class="space-y-4">
                     <button type="button" onclick="selectMode('cashflow')" id="mode-cashflow" class="mode-card w-full p-5 bg-slate-50 border-2 border-slate-200 rounded-2xl text-left hover:border-brand-600 transition-all">
@@ -102,7 +97,7 @@
                             <img src="/static/logo.png" alt="Cash Flow" class="w-12 h-12 object-cover rounded">
                             <div class="flex-1">
                                 <h3 class="text-lg font-bold text-slate-900 mb-1">Cash Flow Mode</h3>
-                                <p class="text-sm text-slate-700 leading-relaxed">Best for students, allowance users, pocket money tracking, and irregular income.</p>
+                                <p class="text-sm text-slate-600 leading-relaxed">Best for students, allowance users, pocket money tracking, and irregular income.</p>
                             </div>
                         </div>
                     </button>
@@ -112,7 +107,7 @@
                             <img src="/static/logo.png" alt="Income" class="w-12 h-12 object-cover rounded">
                             <div class="flex-1">
                                 <h3 class="text-lg font-bold text-slate-900 mb-1">Income Mode</h3>
-                                <p class="text-sm text-slate-700 leading-relaxed">Best for salary earners and structured financial planning.</p>
+                                <p class="text-sm text-slate-600 leading-relaxed">Best for salary earners and structured financial planning.</p>
                             </div>
                         </div>
                     </button>
@@ -124,63 +119,63 @@
             <div id="step-2" class="step-enter hidden">
                 <div class="mb-2 text-xs font-semibold text-brand-400 uppercase tracking-widest">Step 2 of 6</div>
                 <h2 id="step2-title" class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 leading-tight">Let's understand<br>your cash flow</h2>
-                <p id="step2-desc" class="text-slate-700 mb-8 text-base">Your monthly income helps us calculate your savings potential and financial health score.</p>
+                <p id="step2-desc" class="text-slate-600 mb-8 text-base">Your monthly income helps us calculate your savings potential and financial health score.</p>
                 <div class="relative">
                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 font-semibold text-lg">₹</span>
                     <input id="monthly_income" type="text" inputmode="numeric" placeholder="1,50,000"
                         oninput="fmtInput(this)"
                         class="w-full pl-10 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 text-lg font-semibold placeholder-slate-700 focus:outline-none transition-all">
                 </div>
-                <p id="step2-hint" class="mt-3 text-xs text-slate-700">Include salary, freelance, business income — before taxes.</p>
+                <p id="step2-hint" class="mt-3 text-xs text-slate-600">Include salary, freelance, business income — before taxes.</p>
             </div>
 
             
             <div id="step-3" class="step-enter hidden">
                 <div class="mb-2 text-xs font-semibold text-brand-400 uppercase tracking-widest">Step 3 of 6</div>
                 <h2 id="step3-title" class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 leading-tight">How much have<br>you already saved?</h2>
-                <p id="step3-desc" class="text-slate-700 mb-8 text-base">Your current savings balance across all accounts — FDs, liquid funds, savings accounts.</p>
+                <p id="step3-desc" class="text-slate-600 mb-8 text-base">Your current savings balance across all accounts — FDs, liquid funds, savings accounts.</p>
                 <div class="relative">
                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 font-semibold text-lg">₹</span>
                     <input id="current_savings" type="text" inputmode="numeric" placeholder="2,50,000"
                         oninput="fmtInput(this)"
                         class="w-full pl-10 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 text-lg font-semibold placeholder-slate-700 focus:outline-none transition-all">
                 </div>
-                <p id="step3-hint" class="mt-3 text-xs text-slate-700">Not sure? A rough estimate works fine.</p>
+                <p id="step3-hint" class="mt-3 text-xs text-slate-600">Not sure? A rough estimate works fine.</p>
             </div>
 
             
             <div id="step-3" class="step-enter hidden">
                 <div class="mb-2 text-xs font-semibold text-brand-400 uppercase tracking-widest">Step 3 of 5</div>
                 <h2 id="step3b-title" class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 leading-tight">What's currently<br>invested?</h2>
-                <p id="step3b-desc" class="text-slate-700 mb-8 text-base">Stocks, mutual funds, ETFs, crypto, gold — total current market value.</p>
+                <p id="step3b-desc" class="text-slate-600 mb-8 text-base">Stocks, mutual funds, ETFs, crypto, gold — total current market value.</p>
                 <div class="relative">
                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 font-semibold text-lg">₹</span>
                     <input id="current_investments" type="text" inputmode="numeric" placeholder="5,00,000"
                         oninput="fmtInput(this)"
                         class="w-full pl-10 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 text-lg font-semibold placeholder-slate-700 focus:outline-none transition-all">
                 </div>
-                <p id="step3b-hint" class="mt-3 text-xs text-slate-700">Enter 0 if you haven't started investing yet — that's perfectly fine.</p>
+                <p id="step3b-hint" class="mt-3 text-xs text-slate-600">Enter 0 if you haven't started investing yet — that's perfectly fine.</p>
             </div>
 
             
             <div id="step-4" class="step-enter hidden">
                 <div class="mb-2 text-xs font-semibold text-brand-400 uppercase tracking-widest">Step 4 of 5</div>
                 <h2 id="step4-title" class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 leading-tight">What does life<br>cost each month?</h2>
-                <p id="step4-desc" class="text-slate-700 mb-8 text-base">Rent, food, transport, EMIs, subscriptions — your total monthly outflows.</p>
+                <p id="step4-desc" class="text-slate-600 mb-8 text-base">Rent, food, transport, EMIs, subscriptions — your total monthly outflows.</p>
                 <div class="relative">
                     <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 font-semibold text-lg">₹</span>
                     <input id="monthly_expenses" type="text" inputmode="numeric" placeholder="60,000"
                         oninput="fmtInput(this)"
                         class="w-full pl-10 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 text-lg font-semibold placeholder-slate-700 focus:outline-none transition-all">
                 </div>
-                <p id="step4-hint" class="mt-3 text-xs text-slate-700">Include all recurring expenses. EMIs and subscriptions count too.</p>
+                <p id="step4-hint" class="mt-3 text-xs text-slate-600">Include all recurring expenses. EMIs and subscriptions count too.</p>
             </div>
 
             
             <div id="step-5" class="step-enter hidden">
                 <div class="mb-2 text-xs font-semibold text-brand-400 uppercase tracking-widest">Step 5 of 5</div>
                 <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 leading-tight">What's your<br>financial goal?</h2>
-                <p class="text-slate-700 mb-6 text-base">Choose one or describe your own — this shapes your roadmap.</p>
+                <p class="text-slate-600 mb-6 text-base">Choose one or describe your own — this shapes your roadmap.</p>
 
                 <div id="goal-cards" class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5">
                     <div class="goal-card p-4 bg-slate-50 border border-slate-200 rounded-2xl text-center" data-value="Study Abroad">
@@ -224,7 +219,7 @@
                     </div>
                 </div>
                 <h2 class="text-3xl font-extrabold text-slate-900 mb-2 pop" style="animation-delay:.15s">Your financial operating<br>system is ready.</h2>
-                <p class="text-slate-700 mb-8 pop" style="animation-delay:.25s">Here's a summary of what we've set up for you.</p>
+                <p class="text-slate-600 mb-8 pop" style="animation-delay:.25s">Here's a summary of what we've set up for you.</p>
 
                 <div id="summary-cards" class="grid grid-cols-2 gap-3 mb-8 text-left pop" style="animation-delay:.3s"></div>
 
