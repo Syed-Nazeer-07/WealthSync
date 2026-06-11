@@ -21,6 +21,8 @@ const App = {
         savings: [],
         goalForecasts: [],
         investments: [],
+        renderTimer: null,
+        txSelected: new Set(),
     },
     init() {
         if (this.state.darkMode) {
@@ -791,6 +793,11 @@ const App = {
         lucide.createIcons({ nodes: [document.getElementById('sidebar')] });
     },
     render() {
+        // Debounce render to prevent double initialization
+        clearTimeout(this.state.renderTimer);
+        this.state.renderTimer = setTimeout(() => this._doRender(), 10);
+    },
+    _doRender() {
         if (this.state.activeTab === 'transactions' && !this.state.txLoading && !this.state.txError) {
             const focused = document.activeElement;
             const txContent = document.getElementById('tx-table-body');

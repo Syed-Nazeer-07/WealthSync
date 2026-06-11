@@ -176,7 +176,7 @@ class Category(db.Model):
     is_default  = db.Column(db.Boolean, default=False, nullable=False)
     created_at  = db.Column(db.DateTime, default=datetime.utcnow)
 
-    __table_args__ = (db.UniqueConstraint('user_id', 'name', name='_user_category_uc'),)
+    __table_args__ = (db.UniqueConstraint('user_id', 'name', 'category_type', name='_user_category_uc'),)
 
 
 
@@ -1119,15 +1119,16 @@ def create_category():
     if not name or len(name) > 50:
         return jsonify({"error": "Category name must be 1-50 characters"}), 400
     
-    existing = Category.query.filter_by(user_id=session["user_id"], name=name).first()
+    category_type = (data.get("category_type") or "expense").strip()
+    if category_type not in ("income", "expense"):
+        return jsonify({"error": "category_type must be 'income' or 'expense'"}), 400
+    
+    existing = Category.query.filter_by(user_id=session["user_id"], name=name, category_type=category_type).first()
     if existing:
         return jsonify({"error": "Category already exists"}), 400
     
     emoji = (data.get("emoji") or "📦").strip()[:10]
     color = (data.get("color") or "#3b82f6").strip()[:7]
-    category_type = (data.get("category_type") or "expense").strip()
-    if category_type not in ("income", "expense"):
-        return jsonify({"error": "category_type must be 'income' or 'expense'"}), 400
     cat = Category(user_id=session["user_id"], name=name, emoji=emoji, color=color, category_type=category_type, is_default=False)
     db.session.add(cat)
     db.session.commit()
@@ -1147,7 +1148,7 @@ def update_category(cat_id):
         name = (data["name"] or "").strip()
         if not name or len(name) > 50:
             return jsonify({"error": "Name must be 1-50 characters"}), 400
-        dup = Category.query.filter_by(user_id=session["user_id"], name=name).filter(Category.id != cat_id).first()
+        dup = Category.query.filter_by(user_id=session["user_id"], name=name, category_type=cat.category_type).filter(Category.id != cat_id).first()
         if dup:
             return jsonify({"error": "Category name already exists"}), 400
         cat.name = name
