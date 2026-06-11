@@ -1643,6 +1643,7 @@ def google_callback():
         if user:
             user.google_id = google_id
             user.email_verified = True
+            is_new = False  # Existing user, not new
         else:
             user = User(name=name, email=email, google_id=google_id, email_verified=True)
             db.session.add(user)
