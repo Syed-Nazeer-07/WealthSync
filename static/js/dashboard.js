@@ -219,11 +219,14 @@ const AppDashboard = {
                     <div class="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl -ml-20 -mb-20 pointer-events-none"></div>
                     <div class="relative z-10 flex flex-col h-full justify-between">
                         <div class="flex justify-between items-start mb-8">
-                            <div>
-                                <p class="text-slate-400 font-medium text-sm mb-1 uppercase tracking-wider">${isCashFlow ? 'Available Balance' : 'Total Net Worth'}</p>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <p class="text-slate-400 font-medium text-sm uppercase tracking-wider">${isCashFlow ? 'Available Balance' : 'Total Net Worth'}</p>
+                                    ${isCashFlow ? `<button onclick="App.editAvailableBalance()" class="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors" title="Edit Available Balance"><i data-lucide="edit-2" class="w-4 h-4"></i></button>` : ''}
+                                </div>
                                 <h2 class="text-4xl sm:text-5xl font-extrabold tracking-tight">${this.formatCurrency(isCashFlow ? calc.availableBalance : calc.netWorth)}</h2>
                             </div>
-                            <div class="px-3 py-1.5 rounded-full ${calc.netWorthGrowth >= 0 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'} flex items-center gap-1 text-sm font-bold backdrop-blur-md" title="${isCashFlow ? 'Balance change this month' : 'Net worth growth this month'}">
+                            <div class="px-3 py-1.5 rounded-full ${calc.netWorthGrowth >= 0 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'} flex items-center gap-1 text-sm font-bold backdrop-blur-md shrink-0" title="${isCashFlow ? 'Balance change this month' : 'Net worth growth this month'}">
                                 <i data-lucide="${calc.netWorthGrowth >= 0 ? 'trending-up' : 'trending-down'}" class="w-4 h-4"></i>
                                 ${calc.netWorthGrowth >= 0 ? '+' : ''}${calc.netWorthGrowth.toFixed(1)}%
                             </div>

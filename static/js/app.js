@@ -1377,6 +1377,28 @@ const App = {
         Toast.show(`Switched to ${mode === 'cashflow' ? 'Cash Flow' : 'Income'} Mode`, 'success');
         this.render();
     },
+    async editAvailableBalance() {
+        const currentBalance = this.state.profile?.monthly_income || 0;
+        const newBalance = prompt(`Edit Available Balance\n\nCurrent: ₹${this.formatNumber(currentBalance)}\n\nEnter new amount:`, currentBalance);
+        if (newBalance === null) return;
+        const amount = this._parseMoney(newBalance);
+        if (isNaN(amount) || amount < 0) {
+            Toast.show('Invalid amount', 'error');
+            return;
+        }
+        const res = await fetch('/api/profile', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ monthly_income: amount })
+        });
+        if (!res.ok) {
+            Toast.show('Failed to update balance', 'error');
+            return;
+        }
+        this.state.profile.monthly_income = amount;
+        Toast.show('Available Balance updated', 'success');
+        this.render();
+    },
     selectedItems: { tx: [], budget: [], goal: [], investment: [] },
     toggleSelectAllTx() {
         const selectAll = document.getElementById('select-all-tx');
