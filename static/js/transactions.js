@@ -523,7 +523,7 @@ const AppViews = {
                     <div>
                         <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Switch between modes to adapt WealthSync for your financial lifestyle.</p>
                         <div class="space-y-3">
-                            <button onclick="App.switchAccountMode('income')" class="w-full p-4 rounded-xl border-2 text-left transition-all ${(App.state.profile?.account_mode || 'income') === 'income' ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/10 shadow-md' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'}" id="mode-income-btn">
+                            <button onclick="App.switchAccountMode('income')" class="w-full p-4 rounded-xl border-2 text-left transition-all ${(this.state.profile?.account_mode || 'income') === 'income' ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/10 shadow-md ring-1 ring-brand-400' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'}" id="mode-income-btn">
                                 <div class="flex items-start gap-3">
                                     <div class="text-xl">💼</div>
                                     <div>
@@ -532,7 +532,7 @@ const AppViews = {
                                     </div>
                                 </div>
                             </button>
-                            <button onclick="App.switchAccountMode('cashflow')" class="w-full p-4 rounded-xl border-2 text-left transition-all ${(App.state.profile?.account_mode || 'income') === 'cashflow' ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/10 shadow-md' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'}" id="mode-cashflow-btn">>
+                            <button onclick="App.switchAccountMode('cashflow')" class="w-full p-4 rounded-xl border-2 text-left transition-all ${(this.state.profile?.account_mode || 'income') === 'cashflow' ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/10 shadow-md ring-1 ring-brand-400' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'}" id="mode-cashflow-btn">>
                                 <div class="flex items-start gap-3">
                                     <div class="text-xl">💰</div>
                                     <div>
