@@ -140,7 +140,7 @@ const AppDashboard = {
                     healthBadge = `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${healthColors[forecast.health] || healthColors.on_track}">${healthLabels[forecast.health] || 'Unknown'}</span>`;
                 }
                 return `
-                <div class="py-3 border-b border-slate-100 dark:border-dark-border last:border-0">
+                <div class="py-3 border-b border-slate-100 dark:border-slate-700 last:border-0">
                     <div class="flex justify-between items-start mb-1.5">
                         <span class="text-sm font-semibold text-slate-900 dark:text-white truncate mr-2">${goal.name}</span>
                         <div class="flex items-center gap-2 shrink-0">
@@ -164,7 +164,7 @@ const AppDashboard = {
                 ${txList.map(tx => {
                     const catColor = this.getCategoryColor(tx.category);
                     return `
-                <div class="flex items-center gap-3 py-2 border-b border-slate-50 dark:border-dark-border/50 last:border-0">
+                <div class="flex items-center gap-3 py-2 border-b border-slate-50 dark:border-slate-700/50 last:border-0">
                     <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background-color: ${catColor}20; border: 2px solid ${catColor}">
                         <span class="text-base">${this.getCategoryEmoji(tx.category)}</span>
                     </div>
@@ -216,7 +216,7 @@ const AppDashboard = {
             </div>
             <!-- Row 1: Net Worth Hero + Financial Health -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 slide-up delay-100">
-                <div class="lg:col-span-2 relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-slate-900 dark:bg-dark-card border border-slate-800 dark:border-dark-border text-white shadow-2xl hover-card">
+                <div class="lg:col-span-2 relative overflow-hidden rounded-3xl p-6 sm:p-8 bg-slate-900 dark:bg-slate-900 border border-slate-800 dark:border-slate-700 text-white shadow-2xl hover-card">
                     <div class="absolute top-0 right-0 w-96 h-96 bg-brand-500/30 rounded-full blur-3xl -mr-20 -mt-40 pointer-events-none animate-pulse-slow"></div>
                     <div class="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl -ml-20 -mb-20 pointer-events-none"></div>
                     <div class="relative z-10 flex flex-col h-full justify-between">
@@ -241,7 +241,7 @@ const AppDashboard = {
                     </div>
                 </div>
                 <!-- Financial Health -->
-                <div id="financial-health-card" class="bg-white dark:bg-dark-card rounded-3xl p-6 border border-slate-200 dark:border-dark-border shadow-sm hover-card flex flex-col">
+                <div id="financial-health-card" class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm hover-card flex flex-col">
                     <div class="flex justify-between items-start mb-4">
                         <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Financial Health</h3>
                         <button onclick="App._toggleHealthBreakdown()" class="text-brand-500 hover:text-brand-600 text-xs font-semibold flex items-center gap-1">
@@ -272,7 +272,7 @@ const AppDashboard = {
             <!-- Row 2: Monthly Summary + Budget Snapshot -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 slide-up delay-150">
                 <!-- Monthly Summary -->
-                <div class="bg-white dark:bg-dark-card rounded-3xl p-6 border border-slate-200 dark:border-dark-border shadow-sm hover-card">
+                <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm hover-card">
                     <div class="flex items-center justify-between mb-5">
                         <h3 class="font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
                             <i data-lucide="calendar" class="w-5 h-5 text-brand-500"></i> This Month
@@ -295,7 +295,7 @@ const AppDashboard = {
                     </div>
                 </div>
                 <!-- Budget Snapshot -->
-                <div class="bg-white dark:bg-dark-card rounded-3xl p-6 border border-slate-200 dark:border-dark-border shadow-sm hover-card">
+                <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm hover-card">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
                             <i data-lucide="pie-chart" class="w-5 h-5 text-brand-500"></i> Budgets
@@ -331,7 +331,7 @@ const AppDashboard = {
             <!-- Row 3: Recent Activity + Goals + Insights -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 slide-up delay-200">
                 <!-- Recent Activity -->
-                <div class="bg-white dark:bg-dark-card rounded-3xl p-6 border border-slate-200 dark:border-dark-border shadow-sm hover-card">
+                <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm hover-card">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
                             <i data-lucide="clock" class="w-4 h-4 text-purple-500"></i> Recent Activity
@@ -342,7 +342,7 @@ const AppDashboard = {
                         ${activity.today.concat(activity.yesterday, activity.earlier).slice(0, 7).map(tx => {
                             const catColor = this.getCategoryColor(tx.category);
                             return `
-                        <div class="flex items-center gap-3 py-2 border-b border-slate-50 dark:border-dark-border/50 last:border-0">
+                        <div class="flex items-center gap-3 py-2 border-b border-slate-50 dark:border-slate-700/50 last:border-0">
                             <div class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style="background-color: ${catColor}20; border: 2px solid ${catColor}">
                                 <span class="text-base">${this.getCategoryEmoji(tx.category)}</span>
                             </div>
@@ -358,7 +358,7 @@ const AppDashboard = {
                     </div>
                 </div>
                 <!-- Goal Progress -->
-                <div class="bg-white dark:bg-dark-card rounded-3xl p-6 border border-slate-200 dark:border-dark-border shadow-sm hover-card">
+                <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm hover-card">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
                             <i data-lucide="target" class="w-4 h-4 text-brand-500"></i> Active Goals
@@ -368,7 +368,7 @@ const AppDashboard = {
                     ${goalsHtml}
                 </div>
                 <!-- Smart Insights -->
-                <div class="bg-white dark:bg-dark-card rounded-3xl p-6 border border-slate-200 dark:border-dark-border shadow-sm hover-card">
+                <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm hover-card">
                     <h3 class="font-bold text-sm text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                         <i data-lucide="lightbulb" class="w-4 h-4 text-amber-500"></i> Smart Insights
                     </h3>
@@ -377,11 +377,11 @@ const AppDashboard = {
             </div>
             <!-- Row 3: Charts -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 slide-up delay-300">
-                <div class="bg-white dark:bg-dark-card p-6 rounded-3xl border border-slate-200 dark:border-dark-border shadow-sm hover-card">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm hover-card">
                     <h3 class="font-bold text-lg text-slate-900 dark:text-white mb-6">Net Worth Trend</h3>
                     <div class="h-56 relative w-full"><canvas id="netWorthChart"></canvas></div>
                 </div>
-                <div class="bg-white dark:bg-dark-card p-6 rounded-3xl border border-slate-200 dark:border-dark-border shadow-sm hover-card">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm hover-card">
                     <h3 class="font-bold text-lg text-slate-900 dark:text-white mb-6">Expense Breakdown</h3>
                     <div class="h-56 relative w-full flex justify-center"><canvas id="expenseChart"></canvas></div>
                 </div>

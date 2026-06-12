@@ -750,7 +750,7 @@ const App = {
             const overlay = document.createElement('div');
             overlay.className = 'fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm fade-in';
             overlay.innerHTML = `
-                <div class="bg-white dark:bg-dark-card rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-800 w-full max-w-sm slide-up p-8">
+                <div class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-800 w-full max-w-sm slide-up p-8">
                     <h3 class="text-lg font-bold text-slate-900 mb-2">${cfg.title}</h3>
                     <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">${cfg.msg}</p>
                     <input id="danger-pw" type="password" placeholder="Enter your password to confirm" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-500 mb-4">
@@ -804,7 +804,7 @@ const App = {
             { id: 'settings',     label: 'Settings',        icon: 'settings' },
         ];
         document.getElementById('nav-menu').innerHTML = navItems.map(item => {
-            if (!item) return `<div class="sidebar-section-divider mx-3 my-2 border-t border-slate-100 dark:border-dark-border"></div>`;
+            if (!item) return `<div class="sidebar-section-divider mx-3 my-2 border-t border-slate-100 dark:border-slate-700"></div>`;
             const isActive = this.state.activeTab === item.id;
             const activeClasses = isActive
                 ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400 font-semibold shadow-sm ring-1 ring-brand-500'
@@ -1247,7 +1247,7 @@ const App = {
             const sym = this.getCurrencySymbol();
             container.innerHTML = `
                 <div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-                    <div class="bg-white dark:bg-dark-card rounded-[2rem] shadow-2xl max-w-md w-full">
+                    <div class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl max-w-md w-full">
                         <div class="px-8 py-6 border-b border-slate-100 dark:border-slate-800">
                             <h2 class="text-xl font-bold text-slate-900">Confirm Sale</h2>
                             <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Sell ${sellQuantity} shares of ${inv.symbol}</p>
@@ -1299,7 +1299,7 @@ const App = {
         }
         container.innerHTML = `
             <div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity fade-in">
-                <div class="bg-white dark:bg-dark-card rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-800 w-full max-w-md slide-up overflow-hidden">
+                <div class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-800 w-full max-w-md slide-up overflow-hidden">
                     <div class="px-8 py-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/20">
                         <h2 class="text-xl font-bold text-slate-900">${modalTitle}</h2>
                         <button type="button" aria-label="Close dialog" onclick="App.closeModal()" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors focus:ring-2 focus:ring-brand-500 focus:outline-none">
@@ -1324,8 +1324,8 @@ const App = {
         const title = cat ? 'Edit Category' : 'New Category';
         document.getElementById('modal-container').innerHTML = `
             <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-                <div class="bg-white dark:bg-dark-card rounded-2xl shadow-2xl max-w-md w-full animate-scale-in">
-                    <div class="px-6 py-5 border-b border-slate-100 dark:border-dark-border flex items-center justify-between">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-md w-full animate-scale-in">
+                    <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
                         <h2 class="text-xl font-bold text-slate-900">${title}</h2>
                         <button aria-label="Close dialog" onclick="App.closeModal()" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:ring-2 focus:ring-brand-500 focus:outline-none"><i data-lucide="x" class="w-5 h-5"></i></button>
                     </div>
@@ -1419,8 +1419,8 @@ const App = {
         const sym = this.getCurrencySymbol();
         document.getElementById('modal-container').innerHTML = `
             <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-                <div class="bg-white dark:bg-dark-card rounded-2xl shadow-2xl max-w-md w-full animate-scale-in">
-                    <div class="px-6 py-5 border-b border-slate-100 dark:border-dark-border">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-md w-full animate-scale-in">
+                    <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-700">
                         <h2 class="text-xl font-bold text-slate-900">Edit Available Balance</h2>
                         <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Update your current cash on hand</p>
                     </div>
@@ -1477,7 +1477,7 @@ const App = {
         const container = document.getElementById('modal-container');
         container.innerHTML = `
             <div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-                <div class="bg-white dark:bg-dark-card rounded-[2rem] shadow-2xl max-w-md w-full">
+                <div class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl max-w-md w-full">
                     <div class="px-8 py-6 border-b border-slate-100 dark:border-slate-800">
                         <h2 class="text-xl font-bold text-slate-900">Sell ${inv.symbol}</h2>
                         <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">You own ${inv.shares} shares</p>
@@ -1593,7 +1593,7 @@ const App = {
         const container = document.getElementById('modal-container');
         container.innerHTML = `
             <div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" onclick="if(event.target===this) App.closeModal()">
-                <div class="bg-white dark:bg-dark-card rounded-[2rem] shadow-2xl max-w-md w-full">
+                <div class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl max-w-md w-full">
                     <div class="px-8 py-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
                         <h2 class="text-xl font-bold text-slate-900">Sell Asset</h2>
                         <button type="button" onclick="App.closeModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 text-2xl leading-none">×</button>
@@ -1738,7 +1738,7 @@ const App = {
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm';
         modal.innerHTML = `
-            <div class="bg-white dark:bg-dark-card rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-md w-full p-6">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
                         <i data-lucide="trash-2" class="w-6 h-6 text-red-600 dark:text-red-400"></i>

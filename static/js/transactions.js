@@ -12,7 +12,7 @@ const AppViews = {
                         <i data-lucide="plus" class="w-4 h-4"></i> Add Record
                     </button>
                 </div>
-                <div class="flex flex-col sm:flex-row gap-4 bg-white dark:bg-dark-card p-4 rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm">
+                <div class="flex flex-col sm:flex-row gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
                     <div class="relative flex-1">
                         <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
                         <input id="tx-search-input" type="text" placeholder="Search by description, category, or type…" oninput="App.handleTxSearch(event)" value="${this.state.txSearchQuery}" autocomplete="off" class="w-full pl-10 pr-8 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm transition-all">
@@ -25,11 +25,11 @@ const AppViews = {
                         ${this.getCategoryNames().map(c => `<option value="${c}" ${this.state.txFilterCategory === c ? 'selected' : ''}>${this.getCategoryEmoji(c)} ${c}</option>`).join('')}
                     </select>
                 </div>
-                <div class="bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-2xl shadow-sm overflow-hidden w-full">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm overflow-hidden w-full">
                     <div class="overflow-x-auto w-full">
                         <table class="w-full text-left border-collapse min-w-full">
                             <thead>
-                                <tr class="bg-slate-50/50 dark:bg-slate-800/50 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-dark-border">
+                                <tr class="bg-slate-50/50 dark:bg-slate-800/50 text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
                                     <th class="px-6 py-4 font-semibold">
                                         <input type="checkbox" id="select-all-tx" onchange="App.toggleSelectAllTx()" class="w-4 h-4 text-brand-600 border-slate-300 rounded">
                                     </th>
@@ -78,7 +78,7 @@ const AppViews = {
             const catEmoji = this.getCategoryEmoji(tx.category);
             const catColor = this.getCategoryColor(tx.category);
             return `
-            <tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-dark-border last:border-0">
+            <tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-100 dark:border-slate-700 last:border-0">
                 <td class="px-6 py-4">
                     <input type="checkbox" class="tx-checkbox w-4 h-4 text-brand-600 border-slate-300 rounded" value="${tx.id}" onchange="App.updateTxSelection()">
                 </td>
@@ -114,7 +114,7 @@ const AppViews = {
             const forecastClass = runRate > b.limit ? 'text-rose-500' : 'text-emerald-500';
             const catColor = this.getCategoryColor(b.category);
             return `
-                <div class="bg-white dark:bg-dark-card p-6 rounded-3xl border-2 shadow-sm relative group hover-card flex flex-col" style="border-color: ${catColor}40">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border-2 shadow-sm relative group hover-card flex flex-col" style="border-color: ${catColor}40">
                     <div class="absolute top-4 right-4 flex gap-1">
                         <button aria-label="Edit budget" onclick="App.openModal('budget', ${b.id})" class="p-2 text-slate-400 hover:text-brand-500 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-500/10 focus:ring-2 focus:ring-brand-500 focus:outline-none transition-colors" title="Edit"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
                         <button aria-label="Delete budget" onclick="App.deleteItem('budget', ${b.id})" class="p-2 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 focus:ring-2 focus:ring-rose-500 focus:outline-none transition-colors" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
@@ -223,7 +223,7 @@ const AppViews = {
                 }
             }
             return `
-                <div class="bg-white dark:bg-dark-card p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-dark-border shadow-sm flex flex-col relative group hover-card">
+                <div class="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col relative group hover-card">
                     ${isComplete ? '<div class="absolute top-0 left-0 w-full h-1.5 bg-emerald-500"></div>' : ''}
                     <div class="absolute top-4 right-4 flex gap-1 z-10">
                         <button aria-label="Edit goal" onclick="App.openModal('saving', ${goal.id})" class="p-2 text-slate-400 hover:text-brand-500 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-500/10 focus:ring-2 focus:ring-brand-500 focus:outline-none transition-colors" title="Edit"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
@@ -239,7 +239,7 @@ const AppViews = {
                     <div class="flex flex-col md:flex-row items-center gap-8 mb-6">
                         <div class="relative w-32 h-32 shrink-0 rounded-full flex items-center justify-center shadow-inner"
                              style="background: conic-gradient(${isComplete ? '#10b981' : '#4f46e5'} ${percent}%, ${this.state.darkMode ? '#1e293b' : '#f1f5f9'} 0)">
-                            <div class="absolute w-[112px] h-[112px] bg-white dark:bg-dark-card rounded-full flex flex-col items-center justify-center shadow-md border border-slate-100 dark:border-slate-800">
+                            <div class="absolute w-[112px] h-[112px] bg-white dark:bg-slate-900 rounded-full flex flex-col items-center justify-center shadow-md border border-slate-100 dark:border-slate-800">
                                 <span class="text-2xl font-extrabold ${isComplete ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900'}">${percent}%</span>
                             </div>
                         </div>
@@ -314,15 +314,15 @@ const AppViews = {
                 
                 <!-- Summary Cards -->
                 <div class="grid grid-cols-3 gap-4">
-                    <div class="bg-white dark:bg-dark-card rounded-2xl p-4 border border-slate-200 dark:border-dark-border">
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700">
                         <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold mb-1">Total Invested</p>
                         <h3 class="text-2xl font-bold text-slate-900">${this.formatCurrency(totalInvested)}</h3>
                     </div>
-                    <div class="bg-white dark:bg-dark-card rounded-2xl p-4 border border-slate-200 dark:border-dark-border">
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700">
                         <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold mb-1">Total Returned</p>
                         <h3 class="text-2xl font-bold text-slate-900">${this.formatCurrency(totalReturned)}</h3>
                     </div>
-                    <div class="bg-white dark:bg-dark-card rounded-2xl p-4 border border-slate-200 dark:border-dark-border">
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700">
                         <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold mb-1">Net Profit/Loss</p>
                         <h3 class="text-2xl font-bold ${(totalReturned - totalInvested) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">${(totalReturned - totalInvested) >= 0 ? '+' : ''}${this.formatCurrency(totalReturned - totalInvested)}</h3>
                     </div>
@@ -330,7 +330,7 @@ const AppViews = {
                 
                 <!-- Active Assets -->
                 ${activeAssets.length > 0 ? `
-                <div class="bg-white dark:bg-dark-card rounded-2xl p-6 border border-slate-200 dark:border-dark-border">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-700">
                     <h3 class="font-bold text-slate-900 mb-4">Current Active Assets</h3>
                     <div class="space-y-3">
                         ${activeAssets.map(inv => `
@@ -350,7 +350,7 @@ const AppViews = {
                 ` : ''}
                 
                 <!-- Investment History -->
-                <div class="bg-white dark:bg-dark-card rounded-2xl p-6 border border-slate-200 dark:border-dark-border">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-700">
                     <h3 class="font-bold text-slate-900 mb-4">Investment Activity</h3>
                     ${sortedTransactions.length > 0 ? `
                     <div class="space-y-3">
@@ -378,8 +378,8 @@ const AppViews = {
         const verified = u.email_verified;
         const initials = (u.name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
         const section = (title, icon, content) => `
-            <div class="bg-white dark:bg-dark-card rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-slate-100 dark:border-dark-border flex items-center gap-2">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center gap-2">
                     <i data-lucide="${icon}" class="w-4 h-4 text-brand-500"></i>
                     <h3 class="font-semibold text-sm text-slate-900">${title}</h3>
                 </div>
@@ -406,7 +406,7 @@ const AppViews = {
             </div>
             <!-- Profile -->
             ${section('Profile', 'user', `
-                <div class="flex items-center gap-4 pb-4 border-b border-slate-100 dark:border-dark-border">
+                <div class="flex items-center gap-4 pb-4 border-b border-slate-100 dark:border-slate-700">
                     <div class="w-16 h-16 rounded-full bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shrink-0">${initials}</div>
                     <div class="flex-1">
                         <p class="font-bold text-slate-900 text-xl">${u.name || 'User'}</p>
@@ -528,8 +528,8 @@ const AppViews = {
             `)}
             <!-- Monthly Income (Income Mode Only) -->
             ${(this.state.profile?.account_mode || 'income') === 'income' ? `
-            <div class="bg-white dark:bg-dark-card rounded-2xl border border-slate-200 dark:border-dark-border shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-slate-100 dark:border-dark-border flex items-center gap-2">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center gap-2">
                     <i data-lucide="trending-up" class="w-4 h-4 text-brand-500"></i>
                     <h3 class="font-semibold text-sm text-slate-900">Monthly Income</h3>
                 </div>
@@ -615,7 +615,7 @@ const AppViews = {
                 </div>
             `)}
             <!-- Danger Zone -->
-            <div class="bg-white dark:bg-dark-card rounded-2xl border border-rose-200 dark:border-rose-900/50 shadow-sm overflow-hidden">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-900/50 shadow-sm overflow-hidden">
                 <div class="px-6 py-4 border-b border-rose-100 dark:border-rose-900/30 flex items-center gap-2">
                     <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-500"></i>
                     <h3 class="font-semibold text-sm text-rose-700 dark:text-rose-400">Danger Zone</h3>
@@ -628,14 +628,14 @@ const AppViews = {
                         </div>
                         <button onclick="App.dangerAction('clear-transactions')" class="px-3 py-1.5 border border-rose-300 dark:border-rose-700 text-rose-600 dark:text-rose-400 rounded-lg text-xs font-semibold hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors">Delete</button>
                     </div>
-                    <div class="flex items-center justify-between py-2 border-t border-slate-100 dark:border-dark-border">
+                    <div class="flex items-center justify-between py-2 border-t border-slate-100 dark:border-slate-700">
                         <div>
                             <p class="text-sm font-medium text-slate-900">Delete All Financial Data</p>
                             <p class="text-xs text-slate-500 dark:text-slate-400">Removes transactions, budgets, goals, investments and roadmap</p>
                         </div>
                         <button onclick="App.dangerAction('clear-financial-data')" class="px-3 py-1.5 border border-rose-300 dark:border-rose-700 text-rose-600 dark:text-rose-400 rounded-lg text-xs font-semibold hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors">Delete</button>
                     </div>
-                    <div class="flex items-center justify-between py-2 border-t border-slate-100 dark:border-dark-border">
+                    <div class="flex items-center justify-between py-2 border-t border-slate-100 dark:border-slate-700">
                         <div>
                             <p class="text-sm font-medium text-slate-900">Delete Account</p>
                             <p class="text-xs text-slate-500 dark:text-slate-400">Permanently deletes your account and all data</p>
