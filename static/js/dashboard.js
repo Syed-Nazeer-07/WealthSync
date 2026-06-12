@@ -244,9 +244,9 @@ const AppDashboard = {
                 <div id="financial-health-card" class="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm hover-card flex flex-col">
                     <div class="flex justify-between items-start mb-4">
                         <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Financial Health</h3>
-                        <button onclick="App._toggleHealthBreakdown()" class="text-brand-500 hover:text-brand-600 text-xs font-semibold flex items-center gap-1">
-                            <span id="health-toggle-text">View Breakdown</span>
-                            <i data-lucide="chevron-down" id="health-toggle-icon" class="w-3.5 h-3.5 transition-transform"></i>
+                        <button onclick="App.showHealthModal()" class="text-brand-500 hover:text-brand-600 text-xs font-semibold flex items-center gap-1">
+                            <span>View Breakdown</span>
+                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
                     <div class="flex flex-col items-center text-center mb-4">
@@ -263,9 +263,6 @@ const AppDashboard = {
                         <p class="mt-3 text-sm font-semibold ${calc.healthScore >= 75 ? 'text-emerald-600 dark:text-emerald-400' : calc.healthScore >= 55 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400'}">
                             ${calc.healthScore >= 75 ? 'Optimized 🚀' : calc.healthScore >= 55 ? 'Needs Attention' : 'At Risk ⚠️'}
                         </p>
-                    </div>
-                    <div id="health-breakdown" class="hidden space-y-3 pt-4 border-t border-slate-100 dark:border-slate-700">
-                        ${this.getHealthExplanation(calc)}
                     </div>
                 </div>
             </div>
@@ -427,6 +424,42 @@ const AppDashboard = {
             icon.classList.toggle('rotate-180');
             text.textContent = breakdown.classList.contains('hidden') ? 'View Breakdown' : 'Hide Breakdown';
         }
+    },
+    showHealthModal() {
+        const calc = this.getCalculations();
+        document.getElementById('modal-container').innerHTML = `
+            <div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm modal-overlay" role="presentation">
+                <div class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden modal-content modal-standard" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+                    <div class="px-6 sm:px-8 py-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                        <h2 id="modal-title" class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">Financial Health Breakdown</h2>
+                        <button onclick="App.closeModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <div class="p-6 sm:p-8 max-h-[60vh] overflow-y-auto space-y-4">
+                        <div class="flex flex-col items-center text-center mb-6">
+                            <div class="relative w-24 h-24 flex items-center justify-center">
+                                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                                    <path class="text-slate-100 dark:text-slate-800" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="100, 100"/>
+                                    <path class="${calc.healthScore >= 75 ? 'text-emerald-500' : calc.healthScore >= 55 ? 'text-amber-500' : 'text-rose-500'}" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="${calc.healthScore}, 100"/>
+                                </svg>
+                                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                    <span class="text-2xl font-extrabold text-slate-900 dark:text-white">${calc.healthScore}</span>
+                                    <span class="text-[9px] text-slate-400">/ 100</span>
+                                </div>
+                            </div>
+                            <p class="mt-3 text-sm font-semibold ${calc.healthScore >= 75 ? 'text-emerald-600 dark:text-emerald-400' : calc.healthScore >= 55 ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400'}">
+                                ${calc.healthScore >= 75 ? 'Optimized 🚀' : calc.healthScore >= 55 ? 'Needs Attention' : 'At Risk ⚠️'}
+                            </p>
+                        </div>
+                        ${this.getHealthExplanation(calc)}
+                    </div>
+                    <div class="px-6 sm:px-8 py-4 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-3">
+                        <button onclick="App.closeModal()" class="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-semibold text-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Close</button>
+                    </div>
+                </div>
+            </div>`;
+        lucide.createIcons();
     },
     getHealthExplanation(calc) {
         const components = [
