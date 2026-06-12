@@ -168,8 +168,16 @@ const App = {
         }
     },
     toggleTheme() {
-        const newTheme = this.state.darkMode ? 'light' : 'dark';
+        this.state.darkMode = !this.state.darkMode;
+        const newTheme = this.state.darkMode ? 'dark' : 'light';
+        if (this.state.darkMode) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        localStorage.setItem('theme', newTheme);
         this.saveSetting('theme', newTheme);
+        this.updateThemeIcons();
     },
     updateThemeIcons() {
         const iconStr = this.state.darkMode ? 'sun' : 'moon';
@@ -1299,7 +1307,7 @@ const App = {
                         <p id="form-error" class="text-rose-500 text-sm text-center -mb-2"></p>
                         <div class="pt-2 flex gap-4">
                             <button type="button" onclick="App.closeModal()" class="flex-1 px-4 py-3 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl font-semibold text-sm transition-all">Cancel</button>
-                            <button type="submit" class="flex-1 px-4 py-3 !bg-brand-600 hover:!bg-brand-700 !text-white rounded-xl font-semibold text-sm shadow-lg shadow-blue-600/30 hover:-translate-y-0.5 transition-all">${type === 'roadmap' ? 'Add Step' : 'Save Record'}</button>
+                            <button type="submit" class="flex-1 px-4 py-3 bg-brand-600 hover:bg-brand-700 text-white dark:text-white rounded-xl font-semibold text-sm shadow-lg shadow-blue-600/30 hover:-translate-y-0.5 transition-all">${type === 'roadmap' ? 'Add Step' : 'Save Record'}</button>
                         </div>
                     </form>
                 </div>
@@ -1325,7 +1333,7 @@ const App = {
                         <p id="cat-error" class="text-rose-500 text-sm hidden"></p>
                         <div class="flex gap-4 pt-2">
                             <button type="button" onclick="App.closeModal()" class="flex-1 px-4 py-3 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl font-semibold text-sm">Cancel</button>
-                            <button type="submit" class="flex-1 px-4 py-3 !bg-brand-600 hover:!bg-brand-700 !text-white rounded-xl font-semibold text-sm shadow-lg">Save</button>
+                            <button type="submit" class="flex-1 px-4 py-3 bg-brand-600 hover:bg-brand-700 text-white dark:text-white rounded-xl font-semibold text-sm shadow-lg">Save</button>
                         </div>
                     </form>
                 </div>
@@ -1424,7 +1432,7 @@ const App = {
                         <p id="edit-balance-error" class="text-rose-500 text-sm hidden"></p>
                         <div class="flex gap-3 pt-2">
                             <button onclick="App.closeModal()" class="flex-1 px-4 py-3 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl font-semibold text-sm transition-colors">Cancel</button>
-                            <button onclick="App.saveAvailableBalance()" class="flex-1 px-4 py-3 !bg-brand-600 hover:!bg-brand-700 !text-white rounded-xl font-semibold text-sm shadow-lg transition-colors">Save</button>
+                            <button onclick="App.saveAvailableBalance()" class="flex-1 px-4 py-3 bg-brand-600 hover:bg-brand-700 text-white dark:text-white rounded-xl font-semibold text-sm shadow-lg transition-colors">Save</button>
                         </div>
                     </div>
                 </div>
