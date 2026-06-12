@@ -555,7 +555,7 @@ const AppViews = {
                             <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Monthly Income</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">${this.getCurrencySymbol()}</span>
-                                <input id="profile-monthly-income" type="text" inputmode="numeric" value="${this.formatNumber(this.state.profile?.monthly_income || 0)}" class="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+                                <input id="profile-monthly-income" type="text" inputmode="numeric" oninput="App.handleMoneyInput(event)" value="${this.formatNumber(this.state.profile?.monthly_income || 0)}" class="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
                             </div>
                             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Your regular monthly income (salary, freelance, etc.)</p>
                         </div>
@@ -564,7 +564,7 @@ const AppViews = {
                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Current Savings</label>
                         <div class="relative">
                             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">${this.getCurrencySymbol()}</span>
-                            <input id="profile-savings" type="text" inputmode="numeric" value="${this.formatNumber(this.state.profile?.current_savings || 0)}" class="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <input id="profile-savings" type="text" inputmode="numeric" oninput="App.handleMoneyInput(event)" value="${this.formatNumber(this.state.profile?.current_savings || 0)}" class="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
                         </div>
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Balance in savings accounts, FDs, liquid funds</p>
                     </div>
@@ -572,7 +572,7 @@ const AppViews = {
                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Current Investments</label>
                         <div class="relative">
                             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">${this.getCurrencySymbol()}</span>
-                            <input id="profile-investments" type="text" inputmode="numeric" value="${this.formatNumber(this.state.profile?.current_investments || 0)}" class="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <input id="profile-investments" type="text" inputmode="numeric" oninput="App.handleMoneyInput(event)" value="${this.formatNumber(this.state.profile?.current_investments || 0)}" class="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
                         </div>
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Total value of stocks, mutual funds, ETFs, crypto, etc.</p>
                     </div>
@@ -580,7 +580,7 @@ const AppViews = {
                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Monthly Expenses</label>
                         <div class="relative">
                             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">${this.getCurrencySymbol()}</span>
-                            <input id="profile-expenses" type="text" inputmode="numeric" value="${this.formatNumber(this.state.profile?.monthly_expenses || 0)}" class="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <input id="profile-expenses" type="text" inputmode="numeric" oninput="App.handleMoneyInput(event)" value="${this.formatNumber(this.state.profile?.monthly_expenses || 0)}" class="w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500">
                         </div>
                         <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Typical monthly spending (rent, food, bills, etc.)</p>
                     </div>
