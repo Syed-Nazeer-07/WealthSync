@@ -338,7 +338,7 @@ const AppDashboard = {
                         </h3>
                         <button onclick="App.setActiveTab('transactions')" class="text-xs text-brand-500 hover:text-brand-600 font-semibold">View All →</button>
                     </div>
-                    <div class="space-y-3 max-h-64 overflow-y-auto">
+                    <div class="space-y-3 max-h-64 overflow-y-auto pr-2">
                         ${activity.today.concat(activity.yesterday, activity.earlier).slice(0, 7).map(tx => {
                             const catColor = this.getCategoryColor(tx.category);
                             return `
