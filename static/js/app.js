@@ -170,6 +170,9 @@ const App = {
     toggleTheme() {
         this.state.darkMode = !this.state.darkMode;
         const newTheme = this.state.darkMode ? 'dark' : 'light';
+        // Destroy charts before switching theme to avoid canvas reuse error
+        if (this.state.charts.nw) this.state.charts.nw.destroy();
+        if (this.state.charts.expense) this.state.charts.expense.destroy();
         if (this.state.darkMode) {
             document.documentElement.classList.add('dark');
         } else {
@@ -178,6 +181,7 @@ const App = {
         localStorage.setItem('theme', newTheme);
         this.saveSetting('theme', newTheme);
         this.updateThemeIcons();
+        this.render(); // Re-render to recreate charts with new theme
     },
     updateThemeIcons() {
         const iconStr = this.state.darkMode ? 'sun' : 'moon';
