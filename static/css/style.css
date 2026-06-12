@@ -195,3 +195,31 @@ input[type=range]::-webkit-slider-runnable-track {
 .dark input[type=range]::-webkit-slider-runnable-track {
     background: #334155;
 }
+
+/* Disabled Button Styling */
+button:disabled,
+input:disabled,
+textarea:disabled,
+select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+button:disabled:hover {
+    background-color: inherit;
+    transform: none;
+}
+
+/* Focus Visible Styling for Accessibility */
+button:focus-visible {
+    outline: none;
+    ring: 2px;
+    ring-offset: 2px;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: none;
+    ring: 2px;
+}

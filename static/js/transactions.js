@@ -8,7 +8,7 @@ const AppViews = {
                         <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Transaction Ledger</h2>
                         <p class="text-slate-500 dark:text-slate-400 text-sm">Advanced search and filtering.</p>
                     </div>
-                    <button onclick="App.openModal('transaction')" class="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold flex justify-center items-center gap-2 transition-colors shadow-lg">
+                    <button onclick="App.openModal('transaction')" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold flex justify-center items-center gap-2 transition-colors shadow-lg focus:ring-2 focus:ring-brand-500 focus:outline-none">
                         <i data-lucide="plus" class="w-4 h-4"></i> Add Record
                     </button>
                 </div>
@@ -62,10 +62,13 @@ const AppViews = {
         }
         if (filtered.length === 0) {
             return `<tr><td colspan="6" class="py-16 text-center">
-                <div class="flex flex-col items-center gap-2 text-slate-400 dark:text-slate-500">
-                    <i data-lucide="search-x" class="w-8 h-8"></i>
-                    <p class="font-medium text-sm">No transactions found</p>
-                    ${this.state.txSearchQuery ? `<p class="text-xs">Try a different search term or <button onclick="App.clearTxSearch()" class="text-brand-500 hover:underline">clear the search</button></p>` : ''}
+                <div class="flex flex-col items-center gap-3 text-slate-500 dark:text-slate-400">
+                    <i data-lucide="receipt" class="w-10 h-10 opacity-40"></i>
+                    <div>
+                        <p class="font-semibold text-base text-slate-700 dark:text-slate-300 mb-1">No Transactions Yet</p>
+                        <p class="text-sm mb-3">${this.state.txSearchQuery ? 'No results match your search' : 'Start tracking your finances'}</p>
+                        ${this.state.txSearchQuery ? `<button onclick="App.clearTxSearch()" class="px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm rounded font-medium transition-colors">Clear Search</button>` : `<button onclick="App.openModal('transaction')" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-semibold transition-colors">Add Transaction</button>`}
+                    </div>
                 </div>
             </td></tr>`;
         }
@@ -90,10 +93,10 @@ const AppViews = {
                 <td class="px-6 py-4 font-bold text-right whitespace-nowrap ${tx.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-white'}">
                     ${tx.type === 'income' ? '+' : '-'}${this.formatCurrency(tx.amount)}
                 </td>
-                <td class="px-6 py-4 text-right whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+                <td class="px-6 py-4 text-right whitespace-nowrap">
                     <div class="flex items-center justify-end gap-1">
-                        <button onclick="App.openModal('transaction', ${tx.id})" class="text-slate-400 hover:text-brand-500 transition-colors p-2" title="Edit"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
-                        <button onclick="App.deleteItem('transaction', ${tx.id})" class="text-slate-400 hover:text-rose-500 transition-colors p-2" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        <button aria-label="Edit transaction" onclick="App.openModal('transaction', ${tx.id})" class="text-slate-400 hover:text-brand-500 transition-colors p-2 rounded focus:ring-2 focus:ring-brand-500 focus:outline-none" title="Edit"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                        <button aria-label="Delete transaction" onclick="App.deleteItem('transaction', ${tx.id})" class="text-slate-400 hover:text-rose-500 transition-colors p-2 rounded focus:ring-2 focus:ring-rose-500 focus:outline-none" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                     </div>
                 </td>
             </tr>`;
@@ -110,9 +113,9 @@ const AppViews = {
             const catColor = this.getCategoryColor(b.category);
             return `
                 <div class="bg-white dark:bg-dark-card p-6 rounded-3xl border-2 shadow-sm relative group hover-card flex flex-col" style="border-color: ${catColor}40">
-                    <div class="absolute top-4 right-4 flex opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity gap-1">
-                        <button onclick="App.openModal('budget', ${b.id})" class="p-2 text-slate-400 hover:text-brand-500 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-500/10" title="Edit"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
-                        <button onclick="App.deleteItem('budget', ${b.id})" class="p-2 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    <div class="absolute top-4 right-4 flex gap-1">
+                        <button aria-label="Edit budget" onclick="App.openModal('budget', ${b.id})" class="p-2 text-slate-400 hover:text-brand-500 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-500/10 focus:ring-2 focus:ring-brand-500 focus:outline-none transition-colors" title="Edit"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                        <button aria-label="Delete budget" onclick="App.deleteItem('budget', ${b.id})" class="p-2 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 focus:ring-2 focus:ring-rose-500 focus:outline-none transition-colors" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                     </div>
                     <div class="flex items-center gap-4 mb-6">
                         <div class="p-3 rounded-2xl" style="background-color: ${catColor}20">
@@ -159,7 +162,7 @@ const AppViews = {
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     ${cardsHtml}
-                    ${calc.budgetProgress.length === 0 ? `<div class="col-span-full p-12 text-center text-slate-500 border border-dashed border-slate-300 dark:border-slate-700 rounded-3xl">No budgets set.</div>` : ''}
+                    ${calc.budgetProgress.length === 0 ? `<div class="col-span-full p-12 text-center flex flex-col items-center gap-4 border border-dashed border-slate-300 dark:border-slate-700 rounded-3xl"><i data-lucide="pie-chart" class="w-10 h-10 text-slate-400 dark:text-slate-600"></i><div><p class="font-semibold text-slate-700 dark:text-slate-300 mb-1">No Budgets Yet</p><p class="text-sm text-slate-500 dark:text-slate-400 mb-3">Create budgets to track spending</p><button onclick="App.openModal('budget')" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-semibold transition-colors focus:ring-2 focus:ring-brand-500 focus:outline-none">Create Budget</button></div></div>` : ''}
                 </div>
             </div>
         `;
@@ -220,9 +223,9 @@ const AppViews = {
             return `
                 <div class="bg-white dark:bg-dark-card p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-dark-border shadow-sm flex flex-col relative group hover-card">
                     ${isComplete ? '<div class="absolute top-0 left-0 w-full h-1.5 bg-emerald-500"></div>' : ''}
-                    <div class="absolute top-4 right-4 flex opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity gap-1 z-10">
-                        <button onclick="App.openModal('saving', ${goal.id})" class="p-2 text-slate-400 hover:text-brand-500 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-500/10" title="Edit"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
-                        <button onclick="App.deleteItem('saving', ${goal.id})" class="p-2 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    <div class="absolute top-4 right-4 flex gap-1 z-10">
+                        <button aria-label="Edit goal" onclick="App.openModal('saving', ${goal.id})" class="p-2 text-slate-400 hover:text-brand-500 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-500/10 focus:ring-2 focus:ring-brand-500 focus:outline-none transition-colors" title="Edit"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                        <button aria-label="Delete goal" onclick="App.deleteItem('saving', ${goal.id})" class="p-2 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10 focus:ring-2 focus:ring-rose-500 focus:outline-none transition-colors" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                     </div>
                     <div class="flex justify-between items-start w-full mb-6">
                         <div>
@@ -361,7 +364,7 @@ const AppViews = {
                             </div>
                         `).join('')}
                     </div>
-                    ` : '<p class="text-sm text-slate-500 dark:text-slate-400">No investment activity yet.</p>'}
+                    ` : '<div class="flex flex-col items-center gap-3 py-8"><i data-lucide="trending-up" class="w-10 h-10 text-slate-300 dark:text-slate-600"></i><p class="text-slate-700 dark:text-slate-300 font-semibold">No Activity Yet</p><p class="text-sm text-slate-500">Your investment history will appear here</p></div>'}
                 </div>
             </div>
         `;

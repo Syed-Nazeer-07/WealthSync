@@ -104,9 +104,11 @@ const AppDashboard = {
             { label: 'Net ∆',     value: (report.netChange >= 0 ? '+' : '') + this.formatCurrency(report.netChange), color: report.netChange >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400' },
         ];
         const goalsHtml = this.state.savings.length === 0
-            ? `<div class="flex flex-col items-center justify-center py-8 text-slate-400 dark:text-slate-500 text-sm gap-2">
-                <i data-lucide="target" class="w-8 h-8 opacity-40"></i>
-                <p>No goals yet. <button onclick="App.openModal('saving')" class="text-brand-500 hover:underline">Add a goal</button></p>
+            ? `<div class="flex flex-col items-center justify-center py-12 text-center">
+                <i data-lucide="target" class="w-12 h-12 text-slate-300 dark:text-slate-600 mb-4"></i>
+                <p class="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">No Goals Yet</p>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Start saving for your dreams today</p>
+                <button onclick="App.openModal('saving')" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-semibold transition-colors focus:ring-2 focus:ring-brand-500 focus:outline-none">Create Your First Goal</button>
                </div>`
             : this.state.savings.map(goal => {
                 const pct = Math.min(100, goal.target > 0 ? (goal.current / goal.target) * 100 : 0);
@@ -208,7 +210,7 @@ const AppDashboard = {
                         <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-1">Dashboard</h1>
                         <p class="text-slate-500 dark:text-slate-400 text-sm">Your Personal Financial OS.</p>
                        </div>`}
-                <button onclick="App.openModal('transaction')" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold text-sm shadow-lg flex items-center gap-2 transition-colors">
+                <button onclick="App.openModal('transaction')" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-semibold text-sm shadow-lg flex items-center gap-2 transition-colors focus:ring-2 focus:ring-brand-500 focus:outline-none">
                     <i data-lucide="plus" class="w-4 h-4"></i> Add Transaction
                 </button>
             </div>

@@ -38,7 +38,17 @@ const App = {
         this.renderSidebarMenu();
         this.fetchCurrentUser();
         document.addEventListener('keydown', e => {
-            if (e.key === 'Escape' && this.state.isMobileMenuOpen) this.closeMobileSidebar();
+            if (e.key === 'Escape') {
+                if (this.state.isMobileMenuOpen) this.closeMobileSidebar();
+                if (this.state.modal.isOpen) this.closeModal();
+            }
+        });
+        // Handle backdrop click to close modal
+        document.addEventListener('click', e => {
+            if (this.state.modal.isOpen && e.target?.id === 'modal-container') {
+                const overlay = e.target.querySelector('.fixed');
+                if (overlay && e.target === overlay.parentElement) this.closeModal();
+            }
         });
     },
     toggleSidebar() {
@@ -1082,29 +1092,29 @@ const App = {
             const sym = this.getCurrencySymbol();
             formHtml = `
                 <div class="grid grid-cols-2 gap-4">
-                    <button type="button" id="btn-expense" onclick="App.setTxType('expense')" class="py-2.5 rounded-xl text-sm font-bold border-2 transition-all ${this.state.txFormType === 'expense' ? 'border-rose-500 bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400' : 'border-slate-100 dark:border-slate-700 text-slate-500 dark:text-slate-400'}">Expense</button>
-                    <button type="button" id="btn-income" onclick="App.setTxType('income')" class="py-2.5 rounded-xl text-sm font-bold border-2 transition-all ${this.state.txFormType === 'income' ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'border-slate-100 dark:border-slate-700 text-slate-500 dark:text-slate-400'}">Income</button>
+                    <button type="button" id="btn-expense" aria-pressed="${this.state.txFormType === 'expense' ? 'true' : 'false'}" role="radio" aria-label="Expense transaction type" onclick="App.setTxType('expense')" class="py-2.5 rounded-xl text-sm font-bold border-2 transition-all focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 focus:outline-none ${this.state.txFormType === 'expense' ? 'border-rose-500 bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400' : 'border-slate-100 dark:border-slate-700 text-slate-500 dark:text-slate-400'}">Expense</button>
+                    <button type="button" id="btn-income" aria-pressed="${this.state.txFormType === 'income' ? 'true' : 'false'}" role="radio" aria-label="Income transaction type" onclick="App.setTxType('income')" class="py-2.5 rounded-xl text-sm font-bold border-2 transition-all focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 focus:outline-none ${this.state.txFormType === 'income' ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'border-slate-100 dark:border-slate-700 text-slate-500 dark:text-slate-400'}">Income</button>
                 </div>
                 <div class="relative">
-                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Description</label>
-                    <input type="text" name="description" id="tx-desc-input" autocomplete="off" value="${item ? item.description : ''}" required placeholder="e.g. Swiggy Order" oninput="App._descAutocomplete(event)" onblur="App._descHideDropdown()" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5" for="tx-desc-input">Description</label>
+                    <input type="text" id="tx-desc-input" name="description" autocomplete="off" value="${item ? item.description : ''}" required placeholder="e.g. Swiggy Order" oninput="App._descAutocomplete(event)" onblur="App._descHideDropdown()" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
                     <ul id="tx-desc-dropdown" class="hidden absolute z-50 left-0 right-0 mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg overflow-hidden text-sm"></ul>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Amount</label>
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5" for="tx-amount">Amount</label>
                         <div class="relative">
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">${sym}</span>
-                            <input type="text" inputmode="numeric" name="amount" autocomplete="off" value="${item ? this.formatMoneyInput(item.amount) : ''}" oninput="App.handleMoneyInput(event)" required placeholder="0" class="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
+                            <input type="text" inputmode="numeric" id="tx-amount" name="amount" autocomplete="off" value="${item ? this.formatMoneyInput(item.amount) : ''}" oninput="App.handleMoneyInput(event)" required placeholder="0" class="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Date</label>
-                        <input type="date" name="date" required value="${item ? item.date : today}" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5" for="tx-date">Date</label>
+                        <input type="date" id="tx-date" name="date" required value="${item ? item.date : today}" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Category</label>
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5" for="tx-category-select">Category</label>
                     <select name="category" id="tx-category-select" onchange="App.handleCategoryChange(this)" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all">
                         ${catOptions}
                         <option value="__new__">+ Add New Category</option>
@@ -1116,17 +1126,17 @@ const App = {
             const sym = this.getCurrencySymbol();
             formHtml = `
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Category</label>
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5" for="budget-category-select">Category</label>
                     <select name="category" id="budget-category-select" onchange="App.handleCategoryChange(this)" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all">
                         ${catOptions}
                         <option value="__new__">+ Add New Category</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Monthly Limit</label>
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5" for="budget-limit">Monthly Limit</label>
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">${sym}</span>
-                        <input type="text" inputmode="numeric" name="limit" autocomplete="off" value="${item ? this.formatMoneyInput(item.limit) : ''}" oninput="App.handleMoneyInput(event)" required placeholder="0" class="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
+                        <input type="text" inputmode="numeric" id="budget-limit" name="limit" autocomplete="off" value="${item ? this.formatMoneyInput(item.limit) : ''}" oninput="App.handleMoneyInput(event)" required placeholder="0" class="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
                     </div>
                 </div>
             `;
@@ -1134,36 +1144,36 @@ const App = {
             const sym = this.getCurrencySymbol();
             formHtml = `
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Goal Name</label>
-                    <input type="text" name="name" autocomplete="off" value="${item ? item.name : ''}" required placeholder="e.g. New Laptop" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5" for="goal-name">Goal Name</label>
+                    <input type="text" id="goal-name" name="name" autocomplete="off" value="${item ? item.name : ''}" required placeholder="e.g. New Laptop" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Target Amount</label>
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5" for="goal-target">Target Amount</label>
                         <div class="relative">
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">${sym}</span>
-                            <input type="text" inputmode="numeric" name="target" autocomplete="off" value="${item ? this.formatMoneyInput(item.target) : ''}" oninput="App.handleMoneyInput(event)" required placeholder="0" class="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
+                            <input type="text" inputmode="numeric" id="goal-target" name="target" autocomplete="off" value="${item ? this.formatMoneyInput(item.target) : ''}" oninput="App.handleMoneyInput(event)" required placeholder="0" class="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Currently Saved</label>
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5" for="goal-current">Currently Saved</label>
                         <div class="relative">
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">${sym}</span>
-                            <input type="text" inputmode="numeric" name="current" autocomplete="off" value="${item ? this.formatMoneyInput(item.current) : '0'}" oninput="App.handleMoneyInput(event)" required placeholder="0" class="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
+                            <input type="text" inputmode="numeric" id="goal-current" name="current" autocomplete="off" value="${item ? this.formatMoneyInput(item.current) : '0'}" oninput="App.handleMoneyInput(event)" required placeholder="0" class="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
                         </div>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Monthly Save</label>
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5" for="goal-monthly">Monthly Save</label>
                         <div class="relative">
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">${sym}</span>
-                            <input type="text" inputmode="numeric" name="monthlyContribution" value="${item ? this.formatMoneyInput(item.monthlyContribution || '') : ''}" oninput="App.handleMoneyInput(event)" required placeholder="0" class="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
+                            <input type="text" inputmode="numeric" id="goal-monthly" name="monthlyContribution" value="${item ? this.formatMoneyInput(item.monthlyContribution || '') : ''}" oninput="App.handleMoneyInput(event)" required placeholder="0" class="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Target Date</label>
-                        <input type="date" name="date" required value="${item && item.date ? item.date : today}" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5" for="goal-date">Target Date</label>
+                        <input type="date" id="goal-date" name="date" required value="${item && item.date ? item.date : today}" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
                     </div>
                 </div>
             `;
@@ -1172,23 +1182,23 @@ const App = {
             const today = new Date().toISOString().split('T')[0];
             formHtml = `
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Asset Name</label>
-                    <input type="text" name="symbol" autocomplete="off" value="${item ? item.symbol : ''}" required placeholder="e.g. NVIDIA, Gold, Bitcoin" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5" for="inv-symbol">Asset Name</label>
+                    <input type="text" id="inv-symbol" name="symbol" autocomplete="off" value="${item ? item.symbol : ''}" required placeholder="e.g. NVIDIA, Gold, Bitcoin" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Quantity / Units</label>
-                    <input type="number" name="shares" value="${item ? item.shares : ''}" required min="0" step="0.0001" placeholder="0" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5" for="inv-shares">Quantity / Units</label>
+                    <input type="number" id="inv-shares" name="shares" value="${item ? item.shares : ''}" required min="0" step="0.0001" placeholder="0" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Purchase Price Per Unit</label>
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5" for="inv-price">Purchase Price Per Unit</label>
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">${sym}</span>
-                        <input type="text" inputmode="numeric" name="avgCost" value="${item ? this.formatMoneyInput(item.avgCost) : ''}" oninput="App.handleMoneyInput(event)" required placeholder="0" class="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
+                        <input type="text" inputmode="numeric" id="inv-price" name="avgCost" value="${item ? this.formatMoneyInput(item.avgCost) : ''}" oninput="App.handleMoneyInput(event)" required placeholder="0" class="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Purchase Date</label>
-                    <input type="date" name="purchaseDate" value="${item ? item.purchaseDate || today : today}" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5" for="inv-date">Purchase Date</label>
+                    <input type="date" id="inv-date" name="purchaseDate" value="${item ? item.purchaseDate || today : today}" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white transition-all" />
                 </div>
                 <input type="hidden" name="invType" value="Asset" />
                 <input type="hidden" name="currentPrice" value="${item ? this.formatMoneyInput(item.currentPrice) : ''}" />
@@ -1291,7 +1301,7 @@ const App = {
                 <div class="bg-white dark:bg-dark-card rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-800 w-full max-w-md slide-up overflow-hidden">
                     <div class="px-8 py-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/20">
                         <h2 class="text-xl font-bold text-slate-900 dark:text-white">${modalTitle}</h2>
-                        <button type="button" onclick="App.closeModal()" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors">
+                        <button type="button" aria-label="Close dialog" onclick="App.closeModal()" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white transition-colors focus:ring-2 focus:ring-brand-500 focus:outline-none">
                             <i data-lucide="x" class="w-5 h-5"></i>
                         </button>
                     </div>
@@ -1316,11 +1326,11 @@ const App = {
                 <div class="bg-white dark:bg-dark-card rounded-2xl shadow-2xl max-w-md w-full animate-scale-in">
                     <div class="px-6 py-5 border-b border-slate-100 dark:border-dark-border flex items-center justify-between">
                         <h2 class="text-xl font-bold text-slate-900 dark:text-white">${title}</h2>
-                        <button onclick="App.closeModal()" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+                        <button aria-label="Close dialog" onclick="App.closeModal()" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:ring-2 focus:ring-brand-500 focus:outline-none"><i data-lucide="x" class="w-5 h-5"></i></button>
                     </div>
                     <form onsubmit="App.saveCategory(event, ${catId})" class="p-6 space-y-4">
                         <div>
-                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Category Name</label>
+                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5" for="cat-name">Category Name</label>
                             <input type="text" id="cat-name" autocomplete="off" value="${cat ? cat.name : ''}" required maxlength="50" placeholder="e.g. Gym Membership" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm dark:text-white" />
                         </div>
                         <p id="cat-error" class="text-rose-500 text-sm hidden"></p>
@@ -1333,6 +1343,15 @@ const App = {
             </div>
         `;
         lucide.createIcons();
+        // Add backdrop click handler for category modal
+        setTimeout(() => {
+            const overlay = container.querySelector('.fixed.inset-0');
+            if (overlay) {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) this.closeModal();
+                }, { once: false });
+            }
+        }, 10);
     },
     async saveCategory(e, catId) {
         e.preventDefault();
