@@ -707,7 +707,6 @@ const App = {
     formatNumber(num) {
         return new Intl.NumberFormat(this.getCurrencyLocale(), { maximumFractionDigits: 0 }).format(num || 0);
     },
-    async saveFinancialProfile() {
     async saveMonthlyIncome() {
         const parseNum = (val) => parseFloat((val || '').replace(/,/g, '')) || 0;
         const monthly_income = parseNum(document.getElementById('profile-monthly-income')?.value);
