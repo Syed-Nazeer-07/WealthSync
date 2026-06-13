@@ -70,13 +70,20 @@ app.config["MAIL_USERNAME"] = os.environ.get("MAIL_USERNAME")
 app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
 app.config["MAIL_DEFAULT_SENDER"] = os.environ.get("MAIL_DEFAULT_SENDER", os.environ.get("MAIL_USERNAME"))
 
-db = SQLAlchemy(app)
-mail = Mail(app)
+from finora.extensions import db, mail, migrate, oauth
 
-from flask_migrate import Migrate
-migrate = Migrate(app, db)
+db.init_app(app)
+mail.init_app(app)
+migrate.init_app(app, db)
+oauth.init_app(app)
 
-oauth = OAuth(app)
+# Import models after db initialization
+from finora.models import User, Profile, Transaction, Budget, Goal, Investment, RoadmapItem, UserSettings, Category
+
+# Register blueprints
+from finora.blueprints import register_blueprints
+register_blueprints(app)
+
 google = oauth.register(
     name="google",
     client_id=os.environ.get("GOOGLE_CLIENT_ID"),
@@ -86,120 +93,6 @@ google = oauth.register(
     token_url="https://oauth2.googleapis.com/token",
     client_kwargs={"scope": "openid email profile"},
 )
-
-
-
-class User(db.Model):
-    id            = db.Column(db.Integer, primary_key=True)
-    name          = db.Column(db.String(100), nullable=False)
-    email         = db.Column(db.String(150), unique=True, nullable=False)
-    password_hash = db.Column(db.String(256), nullable=True)
-    google_id     = db.Column(db.String(128), nullable=True, index=True)
-    created_at    = db.Column(db.DateTime, default=datetime.utcnow)
-    email_verified            = db.Column(db.Boolean, default=False, nullable=False)
-    email_verification_token  = db.Column(db.String(100), nullable=True)
-    email_verification_expires = db.Column(db.DateTime, nullable=True)
-    password_reset_token      = db.Column(db.String(100), nullable=True)
-    password_reset_expires    = db.Column(db.DateTime, nullable=True)
-
-    profile      = db.relationship("Profile",     back_populates="user", uselist=False, cascade="all, delete-orphan")
-    transactions = db.relationship("Transaction", back_populates="user", cascade="all, delete-orphan")
-
-
-class Profile(db.Model):
-    id                   = db.Column(db.Integer, primary_key=True)
-    user_id              = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, unique=True)
-    monthly_income       = db.Column(db.Float, default=0)
-    current_savings      = db.Column(db.Float, default=0)
-    current_investments  = db.Column(db.Float, default=0)
-    monthly_expenses     = db.Column(db.Float, default=0)
-    financial_goal       = db.Column(db.String(200), default="")
-    account_mode         = db.Column(db.String(20), default="income", nullable=False)
-    onboarding_completed = db.Column(db.Boolean, default=False)
-    tutorial_completed   = db.Column(db.Boolean, default=False)
-
-    user = db.relationship("User", back_populates="profile")
-
-
-class Transaction(db.Model):
-    id          = db.Column(db.Integer, primary_key=True)
-    user_id     = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
-    description = db.Column(db.String(100), nullable=False)
-    amount      = db.Column(db.Float, nullable=False)
-    category    = db.Column(db.String(50), nullable=False)
-    type        = db.Column(db.String(10), nullable=False, default="expense")
-    date        = db.Column(db.String(10), nullable=False, default=str(date.today()))
-
-    user = db.relationship("User", back_populates="transactions")
-
-
-class Budget(db.Model):
-    id           = db.Column(db.Integer, primary_key=True)
-    user_id      = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    category     = db.Column(db.String(50), nullable=False)
-    limit_amount = db.Column(db.Float, nullable=False)
-    created_at   = db.Column(db.DateTime, default=datetime.utcnow)
-
-
-class Goal(db.Model):
-    id             = db.Column(db.Integer, primary_key=True)
-    user_id        = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    title          = db.Column(db.String(100), nullable=False)
-    target_amount  = db.Column(db.Float, nullable=False)
-    current_amount = db.Column(db.Float, default=0)
-    monthly_contribution = db.Column(db.Float, default=0)
-    target_date    = db.Column(db.String(10), nullable=True)
-    created_at     = db.Column(db.DateTime, default=datetime.utcnow)
-
-
-class Investment(db.Model):
-    id            = db.Column(db.Integer, primary_key=True)
-    user_id       = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    symbol        = db.Column(db.String(100), nullable=False)
-    asset_type    = db.Column(db.String(50), nullable=False)
-    quantity      = db.Column(db.Float, nullable=False)
-    average_cost  = db.Column(db.Float, nullable=False)
-    current_value = db.Column(db.Float, nullable=False)
-    created_at    = db.Column(db.DateTime, default=datetime.utcnow)
-
-
-class RoadmapItem(db.Model):
-    __tablename__ = "roadmap_item"
-    id       = db.Column(db.Integer, primary_key=True)
-    user_id  = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    title    = db.Column(db.String(100), nullable=False)
-    icon     = db.Column(db.String(50), nullable=False, default="target")
-    status   = db.Column(db.String(20), nullable=False, default="pending")
-    position = db.Column(db.Integer, nullable=False, default=0)
-
-
-class UserSettings(db.Model):
-    __tablename__ = "user_settings"
-    id                    = db.Column(db.Integer, primary_key=True)
-    user_id               = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, unique=True)
-    theme                 = db.Column(db.String(10),  default="light")
-    currency              = db.Column(db.String(10),  default="INR")
-    currency_symbol       = db.Column(db.String(5),   default="₹")
-    currency_locale       = db.Column(db.String(10),  default="en-IN")
-    show_greeting         = db.Column(db.Boolean,     default=True)
-    sidebar_collapsed     = db.Column(db.Boolean,     default=False)
-    timezone              = db.Column(db.String(50),  default="UTC")
-
-    user = db.relationship("User", backref=db.backref("settings", uselist=False))
-
-
-class Category(db.Model):
-    __tablename__ = "category"
-    id          = db.Column(db.Integer, primary_key=True)
-    user_id     = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    name        = db.Column(db.String(50), nullable=False)
-    emoji       = db.Column(db.String(10), nullable=False, default="📦")
-    color       = db.Column(db.String(7), nullable=False, default="#3b82f6")
-    category_type = db.Column(db.String(10), nullable=False, default="expense")
-    is_default  = db.Column(db.Boolean, default=False, nullable=False)
-    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
-
-    __table_args__ = (db.UniqueConstraint('user_id', 'name', 'category_type', name='_user_category_uc'),)
 
 
 
