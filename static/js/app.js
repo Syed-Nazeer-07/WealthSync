@@ -102,6 +102,7 @@ const App = {
         chartsInitializing: false,
         txSearchQuery: '',
         txFilterCategory: '',
+        txFilterDate: 'all',
         roadmap: [],
         categories: [],
         transactions: [],
@@ -331,10 +332,12 @@ const App = {
         return this.getSortedCategories(type).map(c => c.name);
     },
     getCategoryEmoji(name) {
+        if (name === '__new__') return '➕';
         const cat = this.state.categories.find(c => c.name === name);
         return cat ? cat.emoji : '📦';
     },
     getCategoryColor(name) {
+        if (name === '__new__') return '#64748b'; // slate-500
         const cat = this.state.categories.find(c => c.name === name);
         return cat ? cat.color : '#3b82f6';
     },
@@ -877,6 +880,10 @@ const App = {
         this.state.txFilterCategory = e.target.value;
         this._renderTxTable();
     },
+    handleTxDateFilter(e) {
+        this.state.txFilterDate = e.target.value;
+        this._renderTxTable();
+    },
     clearTxSearch() {
         this.state.txSearchQuery = '';
         const input = document.getElementById('tx-search-input');
@@ -1245,9 +1252,10 @@ const App = {
         const { type, entityId } = this.state.modal;
         const id = entityId || Date.now();
         if (type === 'transaction') {
+            const amountRaw = fd.get('amount_val') || fd.get('amount');
             const payload = {
                 description: fd.get('description'),
-                amount:      this._parseMoney(fd.get('amount') || '0'),
+                amount:      this._parseMoney(amountRaw || '0'),
                 date:        fd.get('date'),
                 category:    fd.get('category'),
                 type:        this.state.txFormType,
@@ -1255,6 +1263,37 @@ const App = {
             const submitBtn = event.target.querySelector('[type=submit]');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Saving…';
+            
+            // Clear previous errors
+            const inputs = event.target.querySelectorAll('input, select');
+            inputs.forEach(i => i.classList.remove('border-rose-500'));
+            const errorSpans = event.target.querySelectorAll('span[id$="-error"]');
+            errorSpans.forEach(s => { s.classList.add('hidden'); s.textContent = ''; });
+            const formError = event.target.querySelector('#form-error');
+            if (formError) { formError.textContent = ''; formError.classList.add('hidden'); }
+            
+            // Basic frontend validation
+            let hasError = false;
+            if (!payload.description || payload.description.trim() === '') {
+                const errEl = document.getElementById('tx-desc-error');
+                if (errEl) { errEl.textContent = 'Description is required'; errEl.classList.remove('hidden'); }
+                const inp = document.getElementById('tx-desc-input');
+                if (inp) inp.classList.add('border-rose-500');
+                hasError = true;
+            }
+            if (isNaN(payload.amount) || payload.amount <= 0) {
+                const errEl = document.getElementById('tx-amount-error');
+                if (errEl) { errEl.textContent = 'Valid amount required'; errEl.classList.remove('hidden'); }
+                const inp = document.getElementById('tx-amount');
+                if (inp) inp.classList.add('border-rose-500');
+                hasError = true;
+            }
+            
+            if (hasError) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = entityId ? 'Save' : 'Add Transaction';
+                return;
+            }
             try {
                 const url = entityId ? `/api/transactions/${entityId}` : '/api/transactions';
                 const method = entityId ? 'PUT' : 'POST';
@@ -1513,7 +1552,7 @@ const App = {
                         <label class="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1.5" for="tx-amount">Amount</label>
                         <div class="relative">
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">${sym}</span>
-                            <input type="text" inputmode="numeric" id="tx-amount" name="amount" autocomplete="off" value="${item ? this.formatMoneyInput(item.amount) : ''}" required placeholder="0.00" aria-invalid="false" aria-describedby="tx-amount-error" oninput="App.handleMoneyInput(event)" onfocus="this.select()" class="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-2 focus:outline-brand-500 focus:outline-offset-2 text-sm transition-all" />
+                            <input type="text" inputmode="numeric" id="tx-amount" name="amount_val" autocomplete="off" value="${item ? this.formatMoneyInput(item.amount) : ''}" required placeholder="0.00" aria-invalid="false" aria-describedby="tx-amount-error" oninput="App.handleMoneyInput(event)" onfocus="this.select()" class="w-full pl-9 pr-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-2 focus:outline-brand-500 focus:outline-offset-2 text-sm transition-all" />
                         </div>
                         <span id="tx-amount-error" class="hidden text-rose-500 text-xs mt-1 block"></span>
                     </div>
@@ -1820,22 +1859,35 @@ const App = {
                 // Auto-select the newly created category in the pending dropdown
                 if (this.state.pendingCategorySelect) {
                     const select = this.state.pendingCategorySelect;
-                    // Remove the __new__ option temporarily
-                    const newOption = select.querySelector('option[value="__new__"]');
-                    if (newOption) newOption.remove();
                     
-                    // Add new category option
-                    const opt = document.createElement('option');
-                    opt.value = name;
-                    opt.textContent = name;
-                    opt.selected = true;
-                    select.appendChild(opt);
-                    
-                    // Re-add __new__ option at the end
-                    const addNewOpt = document.createElement('option');
-                    addNewOpt.value = '__new__';
-                    addNewOpt.textContent = '+ Add New Category';
-                    select.appendChild(addNewOpt);
+                    // We must wait for the DOM to update since App._getTxRows might trigger a render 
+                    // or the select might be re-rendered. Let's do it safely:
+                    setTimeout(() => {
+                        // Attempt to find the select again in case it was re-rendered
+                        const activeSelect = document.querySelector('select[name="category"]');
+                        if (activeSelect) {
+                            // Find option
+                            let opt = Array.from(activeSelect.options).find(o => o.value === name);
+                            if (opt) {
+                                opt.selected = true;
+                            } else {
+                                // If not found, add it
+                                const newOption = activeSelect.querySelector('option[value="__new__"]');
+                                if (newOption) newOption.remove();
+                                
+                                const optEl = document.createElement('option');
+                                optEl.value = name;
+                                optEl.textContent = name;
+                                optEl.selected = true;
+                                activeSelect.appendChild(optEl);
+                                
+                                const addNewOpt = document.createElement('option');
+                                addNewOpt.value = '__new__';
+                                addNewOpt.textContent = '+ Add New Category';
+                                activeSelect.appendChild(addNewOpt);
+                            }
+                        }
+                    }, 100);
                     
                     this.state.pendingCategorySelect = null;
                 }

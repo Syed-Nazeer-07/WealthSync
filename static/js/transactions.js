@@ -20,6 +20,13 @@ const AppViews = {
                             <i data-lucide="x" class="w-3.5 h-3.5"></i>
                         </button>
                     </div>
+                    <select id="tx-date-filter-select" onchange="App.handleTxDateFilter(event)" class="px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm transition-all">
+                        <option value="all" ${this.state.txFilterDate === 'all' ? 'selected' : ''}>All Time</option>
+                        <option value="this_month" ${this.state.txFilterDate === 'this_month' ? 'selected' : ''}>This Month</option>
+                        <option value="last_month" ${this.state.txFilterDate === 'last_month' ? 'selected' : ''}>Last Month</option>
+                        <option value="last_3_months" ${this.state.txFilterDate === 'last_3_months' ? 'selected' : ''}>Last 3 Months</option>
+                        <option value="this_year" ${this.state.txFilterDate === 'this_year' ? 'selected' : ''}>This Year</option>
+                    </select>
                     <select id="tx-filter-select" onchange="App.handleTxFilter(event)" class="px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm transition-all">
                         <option value="All">All Categories</option>
                         ${this.getCategoryNames().map(c => `<option value="${c}" ${this.state.txFilterCategory === c ? 'selected' : ''}>${this.getCategoryEmoji(c)} ${c}</option>`).join('')}
@@ -60,16 +67,41 @@ const AppViews = {
         if (this.state.txFilterCategory && this.state.txFilterCategory !== 'All') {
             filtered = filtered.filter(tx => tx.category === this.state.txFilterCategory);
         }
+        
+        if (this.state.txFilterDate && this.state.txFilterDate !== 'all') {
+            const today = new Date();
+            let startDate = new Date(0);
+            let endDate = new Date('9999-12-31');
+            
+            if (this.state.txFilterDate === 'this_month') {
+                startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            } else if (this.state.txFilterDate === 'last_month') {
+                startDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                endDate = new Date(today.getFullYear(), today.getMonth(), 0);
+            } else if (this.state.txFilterDate === 'last_3_months') {
+                startDate = new Date(today.getFullYear(), today.getMonth() - 3, 1);
+            } else if (this.state.txFilterDate === 'this_year') {
+                startDate = new Date(today.getFullYear(), 0, 1);
+            }
+            
+            filtered = filtered.filter(tx => {
+                const txDate = new Date(tx.date);
+                return txDate >= startDate && txDate <= endDate;
+            });
+        }
+        
         // Sort by date, latest first
         filtered = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
         if (filtered.length === 0) {
-            return `<tr><td colspan="6" class="py-16 text-center">
-                <div class="flex flex-col items-center gap-3 text-slate-500 dark:text-slate-400">
-                    <i data-lucide="receipt" class="w-10 h-10 opacity-40"></i>
+            return `<tr><td colspan="6" class="py-20 text-center">
+                <div class="flex flex-col items-center gap-5 max-w-sm mx-auto">
+                    <div class="w-16 h-16 bg-brand-100 dark:bg-brand-500/20 rounded-full flex items-center justify-center mb-2">
+                        <i data-lucide="receipt" class="w-8 h-8 text-brand-600 dark:text-brand-400"></i>
+                    </div>
                     <div>
-                        <p class="font-semibold text-base text-slate-700 dark:text-slate-300 mb-1">No Transactions Yet</p>
-                        <p class="text-sm mb-3">${this.state.txSearchQuery ? 'No results match your search' : 'Start tracking your finances'}</p>
-                        ${this.state.txSearchQuery ? `<button onclick="App.clearTxSearch()" class="px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white text-sm rounded font-medium transition-colors">Clear Search</button>` : `<button onclick="App.openModal('transaction')" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-semibold transition-colors">Add Transaction</button>`}
+                        <p class="font-bold text-xl text-slate-900 dark:text-white mb-2">\${this.state.txSearchQuery ? 'No Matching Records' : 'No Transactions Yet'}</p>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">\${this.state.txSearchQuery ? 'Try adjusting your search or filters to find what you are looking for.' : 'Start tracking your daily income and expenses to take control of your financial health.'}</p>
+                        \${this.state.txSearchQuery ? \`<button onclick="App.clearTxSearch()" class="px-6 py-3 bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition-all shadow-lg hover:-translate-y-0.5">Clear Search</button>\` : \`<button onclick="App.openModal('transaction')" class="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-brand-500/30 hover:-translate-y-0.5">Add Your First Record</button>\`}
                     </div>
                 </div>
             </td></tr>`;
@@ -164,7 +196,17 @@ const AppViews = {
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     ${cardsHtml}
-                    ${calc.budgetProgress.length === 0 ? `<div class="col-span-full p-12 text-center flex flex-col items-center gap-4 border border-dashed border-slate-300 dark:border-slate-700 rounded-3xl"><i data-lucide="pie-chart" class="w-10 h-10 text-slate-400 dark:text-slate-600"></i><div><p class="font-semibold text-slate-700 dark:text-slate-300 mb-1">No Budgets Yet</p><p class="text-sm text-slate-500 dark:text-slate-400 mb-3">Create budgets to track spending</p><button onclick="App.openModal('budget')" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-sm font-semibold transition-colors focus:ring-2 focus:ring-brand-500 focus:outline-none">Create Budget</button></div></div>` : ''}
+                    ${calc.budgetProgress.length === 0 ? `
+                    <div class="col-span-full p-16 text-center flex flex-col items-center gap-5 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-3xl bg-slate-50/50 dark:bg-slate-800/20">
+                        <div class="w-16 h-16 bg-purple-100 dark:bg-purple-500/20 rounded-2xl flex items-center justify-center mb-2 transform rotate-3">
+                            <i data-lucide="pie-chart" class="w-8 h-8 text-purple-600 dark:text-purple-400"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-xl text-slate-900 dark:text-white mb-2">Take Control of Spending</p>
+                            <p class="text-slate-500 dark:text-slate-400 mb-6 max-w-md mx-auto text-sm">Create budgets for specific categories to keep your expenses in check. We'll automatically track your progress and forecast your end-of-month spending.</p>
+                            <button onclick="App.openModal('budget')" class="px-6 py-3 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-white rounded-xl text-sm font-semibold transition-all shadow-lg hover:-translate-y-0.5">Create First Budget</button>
+                        </div>
+                    </div>` : ''}
                 </div>
             </div>
         `;
@@ -280,10 +322,15 @@ const AppViews = {
                     </button>
                 </div>
                 ${this.state.savings.length === 0 ? `
-                <div class="flex flex-col items-center justify-center py-16 text-slate-400 dark:text-slate-500 gap-4">
-                    <i data-lucide="target" class="w-16 h-16 opacity-40"></i>
-                    <p class="text-lg">No goals yet. Create your first goal to get started!</p>
-                    <button onclick="App.openModal('saving')" class="text-brand-500 hover:underline font-semibold">+ Add Goal</button>
+                <div class="col-span-full p-16 text-center flex flex-col items-center gap-5 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-3xl bg-slate-50/50 dark:bg-slate-800/20 mt-4">
+                    <div class="w-16 h-16 bg-rose-100 dark:bg-rose-500/20 rounded-2xl flex items-center justify-center mb-2">
+                        <i data-lucide="target" class="w-8 h-8 text-rose-600 dark:text-rose-400"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-xl text-slate-900 dark:text-white mb-2">Set Financial Goals</p>
+                        <p class="text-slate-500 dark:text-slate-400 mb-6 max-w-md mx-auto text-sm">Planning a vacation? Buying a home? Set a savings goal and track your progress to stay motivated and hit your targets on time.</p>
+                        <button onclick="App.openModal('saving')" class="px-6 py-3 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-white rounded-xl text-sm font-semibold transition-all shadow-lg hover:-translate-y-0.5">Create First Goal</button>
+                    </div>
                 </div>
                 ` : `<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">${cardsHtml}</div>`}
             </div>
@@ -312,62 +359,75 @@ const AppViews = {
                     </div>
                 </div>
                 
+                ${this.state.investments.length === 0 ? `
+                <div class="col-span-full p-16 text-center flex flex-col items-center gap-5 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-3xl bg-slate-50/50 dark:bg-slate-800/20 mt-4">
+                    <div class="w-16 h-16 bg-emerald-100 dark:bg-emerald-500/20 rounded-2xl flex items-center justify-center mb-2 transform -rotate-3">
+                        <i data-lucide="trending-up" class="w-8 h-8 text-emerald-600 dark:text-emerald-400"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-xl text-slate-900 dark:text-white mb-2">Build Your Portfolio</p>
+                        <p class="text-slate-500 dark:text-slate-400 mb-6 max-w-md mx-auto text-sm">Keep track of your stocks, mutual funds, crypto, and other assets in one place to monitor your overall net worth and returns.</p>
+                        <button onclick="App.openModal('investment')" class="px-6 py-3 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-white rounded-xl text-sm font-semibold transition-all shadow-lg hover:-translate-y-0.5">Add Your First Asset</button>
+                    </div>
+                </div>
+                ` : `
                 <!-- Summary Cards -->
                 <div class="grid grid-cols-3 gap-4">
                     <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700">
                         <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold mb-1">Total Invested</p>
-                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white dark:text-white">${this.formatCurrency(totalInvested)}</h3>
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white dark:text-white">\${this.formatCurrency(totalInvested)}</h3>
                     </div>
                     <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700">
                         <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold mb-1">Total Returned</p>
-                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white dark:text-white">${this.formatCurrency(totalReturned)}</h3>
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white dark:text-white">\${this.formatCurrency(totalReturned)}</h3>
                     </div>
                     <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700">
                         <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold mb-1">Net Profit/Loss</p>
-                        <h3 class="text-2xl font-bold ${(totalReturned - totalInvested) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">${(totalReturned - totalInvested) >= 0 ? '+' : ''}${this.formatCurrency(totalReturned - totalInvested)}</h3>
+                        <h3 class="text-2xl font-bold \${(totalReturned - totalInvested) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">\${(totalReturned - totalInvested) >= 0 ? '+' : ''}\${this.formatCurrency(totalReturned - totalInvested)}</h3>
                     </div>
                 </div>
                 
                 <!-- Active Assets -->
-                ${activeAssets.length > 0 ? `
+                \${activeAssets.length > 0 ? \`
                 <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-700">
                     <h3 class="font-bold text-slate-900 dark:text-white mb-4">Current Active Assets</h3>
                     <div class="space-y-3">
-                        ${activeAssets.map(inv => `
+                        \${activeAssets.map(inv => \`
                             <div class="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
                                 <div>
-                                    <p class="font-semibold text-slate-900 dark:text-white">${inv.symbol}</p>
-                                    <p class="text-sm text-slate-600 dark:text-slate-400">${inv.shares} Units</p>
+                                    <p class="font-semibold text-slate-900 dark:text-white">\${inv.symbol}</p>
+                                    <p class="text-sm text-slate-600 dark:text-slate-400">\${inv.shares} Units</p>
                                 </div>
                                 <div class="text-right">
                                     <p class="text-sm text-slate-600 dark:text-slate-400">Invested</p>
-                                    <p class="font-semibold text-slate-900 dark:text-white">${this.formatCurrency(inv.shares * inv.avgCost)}</p>
+                                    <p class="font-semibold text-slate-900 dark:text-white">\${this.formatCurrency(inv.shares * inv.avgCost)}</p>
                                 </div>
                             </div>
-                        `).join('')}
+                        \`).join('')}
                     </div>
                 </div>
-                ` : ''}
+                \` : ''}
                 
                 <!-- Investment History -->
                 <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-700">
                     <h3 class="font-bold text-slate-900 dark:text-white mb-4">Investment Activity</h3>
-                    ${sortedTransactions.length > 0 ? `
+                    \${sortedTransactions.length > 0 ? \`
                     <div class="space-y-3">
-                        ${sortedTransactions.slice(0, 10).map(t => `
+                        \${sortedTransactions.slice(0, 10).map(t => \`
                             <div class="flex justify-between items-start py-2 px-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
                                 <div class="flex-1">
-                                    <p class="font-semibold text-slate-900 dark:text-white text-sm">${t.description}</p>
-                                    <p class="text-xs text-slate-500 dark:text-slate-400">${this.formatDate(t.date)}</p>
+                                    <p class="font-semibold text-slate-900 dark:text-white text-sm">\${t.description}</p>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400">\${this.formatDate(t.date)}</p>
                                 </div>
                                 <div class="text-right">
-                                    <p class="text-sm font-semibold ${t.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900'}">${t.type === 'income' ? '+' : '-'}${this.formatCurrency(t.amount)}</p>
+                                    <p class="text-sm font-semibold \${t.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900'}">\${t.type === 'income' ? '+' : '-'}\${this.formatCurrency(t.amount)}</p>
                                 </div>
                             </div>
-                        `).join('')}
+                        \`).join('')}
                     </div>
-                    ` : '<div class="flex flex-col items-center gap-3 py-8"><i data-lucide="trending-up" class="w-10 h-10 text-slate-300 dark:text-slate-600"></i><p class="text-slate-700 dark:text-slate-300 font-semibold">No Activity Yet</p><p class="text-sm text-slate-500">Your investment history will appear here</p></div>'}
+                    \` : '<div class="flex flex-col items-center gap-3 py-8"><i data-lucide="trending-up" class="w-10 h-10 text-slate-300 dark:text-slate-600"></i><p class="text-slate-700 dark:text-slate-300 font-semibold">No Activity Yet</p><p class="text-sm text-slate-500">Your investment history will appear here</p></div>'}
                 </div>
+                `}
             </div>
         `;
     },

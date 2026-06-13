@@ -112,10 +112,9 @@
                 <h2 id="step2-title" class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 leading-tight">Let's understand<br>your cash flow</h2>
                 <p id="step2-desc" class="text-slate-600 mb-8 text-base">Your monthly income helps us calculate your savings potential and financial health score.</p>
                 <div class="relative">
-                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 font-semibold text-lg">₹</span>
-                    <input id="monthly_income" type="text" inputmode="numeric" placeholder="e.g., 50,000" autocomplete="off"
+                    <input id="monthly_income" type="text" inputmode="numeric" placeholder="e.g., 5000" autocomplete="off"
                         oninput="fmtInput(this)" onfocus="this.select()"
-                        class="w-full pl-10 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 text-lg font-semibold placeholder-slate-400 focus:outline-none transition-all">
+                        class="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 text-lg font-semibold placeholder-slate-400 focus:outline-none transition-all">
                 </div>
                 <p id="step2-hint" class="mt-3 text-xs text-slate-600">Include salary, freelance, business income — before taxes.</p>
             </div>
@@ -126,10 +125,9 @@
                 <h2 id="step3-title" class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 leading-tight">How much have<br>you already saved?</h2>
                 <p id="step3-desc" class="text-slate-600 mb-8 text-base">Your current savings balance across all accounts — FDs, liquid funds, savings accounts.</p>
                 <div class="relative">
-                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 font-semibold text-lg">₹</span>
-                    <input id="current_savings" type="text" inputmode="numeric" placeholder="e.g., 1,00,000" autocomplete="off"
+                    <input id="current_savings" type="text" inputmode="numeric" placeholder="e.g., 10000" autocomplete="off"
                         oninput="fmtInput(this)" onfocus="this.select()"
-                        class="w-full pl-10 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 text-lg font-semibold placeholder-slate-400 focus:outline-none transition-all">
+                        class="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 text-lg font-semibold placeholder-slate-400 focus:outline-none transition-all">
                 </div>
                 <p id="step3-hint" class="mt-3 text-xs text-slate-600">Not sure? A rough estimate works fine.</p>
             </div>
@@ -140,10 +138,9 @@
                 <h2 id="step3b-title" class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 leading-tight">What's currently<br>invested?</h2>
                 <p id="step3b-desc" class="text-slate-600 mb-8 text-base">Stocks, mutual funds, ETFs, crypto, gold — total current market value.</p>
                 <div class="relative">
-                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 font-semibold text-lg">₹</span>
-                    <input id="current_investments" type="text" inputmode="numeric" placeholder="e.g., 50,000 or 0"
+                    <input id="current_investments" type="text" inputmode="numeric" placeholder="e.g., 5000 or 0"
                         oninput="fmtInput(this)" onfocus="this.select()"
-                        class="w-full pl-10 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 text-lg font-semibold placeholder-slate-400 focus:outline-none transition-all">
+                        class="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 text-lg font-semibold placeholder-slate-400 focus:outline-none transition-all">
                 </div>
                 <p id="step3b-hint" class="mt-3 text-xs text-slate-600">Enter 0 if you haven't started investing yet — that's perfectly fine.</p>
             </div>
@@ -154,10 +151,9 @@
                 <h2 id="step4-title" class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3 leading-tight">What does life<br>cost each month?</h2>
                 <p id="step4-desc" class="text-slate-600 mb-8 text-base">Rent, food, transport, EMIs, subscriptions — your total monthly outflows.</p>
                 <div class="relative">
-                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 font-semibold text-lg">₹</span>
-                    <input id="monthly_expenses" type="text" inputmode="numeric" placeholder="e.g., 30,000"
+                    <input id="monthly_expenses" type="text" inputmode="numeric" placeholder="e.g., 3000"
                         oninput="fmtInput(this)" onfocus="this.select()"
-                        class="w-full pl-10 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 text-lg font-semibold placeholder-slate-400 focus:outline-none transition-all">
+                        class="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 text-lg font-semibold placeholder-slate-400 focus:outline-none transition-all">
                 </div>
                 <p id="step4-hint" class="mt-3 text-xs text-slate-600">Include all recurring expenses. EMIs and subscriptions count too.</p>
             </div>
@@ -315,7 +311,7 @@
         if (raw === '' || isNaN(raw)) return;
         const pos = input.selectionStart;
         const charsAfter = input.value.length - pos;
-        input.value = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(raw);
+        input.value = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(raw);
         const newPos = Math.max(0, input.value.length - charsAfter);
         input.setSelectionRange(newPos, newPos);
     }
@@ -381,7 +377,7 @@
         if (input && input.type !== 'hidden') {
             const stored = data[inputId];
             input.value = (stored != null && stored !== '' && input.inputMode === 'numeric')
-                ? new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(stored)
+                ? new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(stored)
                 : (data[inputId] ?? '');
             setTimeout(() => input.focus(), 80);
         }
@@ -473,7 +469,7 @@
     }
 
     function fmt(n) {
-        return new Intl.NumberFormat('en-IN', { style:'currency', currency:'INR', maximumFractionDigits:0 }).format(n || 0);
+        return new Intl.NumberFormat(undefined, { maximumFractionDigits:0 }).format(n || 0);
     }
 
     function showCelebration() {
@@ -536,7 +532,7 @@
         if (field === 'financial_goal') {
             input.value = data[field] || '';
         } else {
-            input.value = data[field] ? new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(data[field]) : '0';
+            input.value = data[field] ? new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(data[field]) : '0';
         }
         
         display.classList.add('hidden');
@@ -582,7 +578,7 @@
                 if (raw && !isNaN(raw)) {
                     const pos = e.target.selectionStart;
                     const charsAfter = e.target.value.length - pos;
-                    e.target.value = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(raw);
+                    e.target.value = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(raw);
                     const newPos = Math.max(0, e.target.value.length - charsAfter);
                     e.target.setSelectionRange(newPos, newPos);
                 }
