@@ -56,8 +56,8 @@ const ConfirmModal = (() => {
                     <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">${message}</p>
                 </div>
                 <div class="px-8 pb-8 flex gap-3">
-                    <button id="confirm-cancel" class="flex-1 px-4 py-3 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl font-semibold text-sm transition-all">Cancel</button>
-                    <button id="confirm-ok" class="flex-1 px-4 py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-semibold text-sm shadow-lg shadow-rose-500/30 hover:-translate-y-0.5 transition-all">${confirmLabel}</button>
+                    <button id="confirm-cancel" class="flex-1 px-4 py-3 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl font-semibold text-sm">Cancel</button>
+                    <button id="confirm-ok" class="flex-1 px-4 py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-semibold text-sm shadow-lg shadow-rose-500/30">${confirmLabel}</button>
                 </div>
             </div>
         `;

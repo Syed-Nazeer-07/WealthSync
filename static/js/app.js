@@ -494,36 +494,44 @@ const App = {
             const current_savings  = Number(p.current_savings || 0) || 0;
             const monthly_income   = Number(p.monthly_income || 0) || 0;
             const monthly_expenses = Number(p.monthly_expenses || 0) || 0;
+            
+            const txs = Array.isArray(this.state.transactions) ? this.state.transactions : [];
+            const invs = Array.isArray(this.state.investments) ? this.state.investments : [];
+            const budgets = Array.isArray(this.state.budgets) ? this.state.budgets : [];
+            const savings = Array.isArray(this.state.savings) ? this.state.savings : [];
 
-            console.log("--- DASHBOARD INIT AUDIT ---");
-            console.log("Mode:", p.account_mode);
-            console.log("Savings:", current_savings);
-            console.log("Income:", monthly_income);
-            console.log("Expenses:", monthly_expenses);
-            
-            const txIncome   = this.state.transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + Number(t.amount || 0), 0);
-            const txExpenses = this.state.transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + Number(t.amount || 0), 0);
-            
-            const totalIncome   = Number(txIncome || monthly_income) || 0;
+            // Core Transaction Math
+            const txIncome = txs.filter(t => t.type === 'income').reduce((acc, t) => acc + Number(t.amount || 0), 0);
+            const txExpenses = txs.filter(t => t.type === 'expense').reduce((acc, t) => acc + Number(t.amount || 0), 0);
+            const totalIncome = Number(txIncome || monthly_income) || 0;
             const totalExpenses = Number(txExpenses || monthly_expenses) || 0;
 
-            const validInvestments = this.state.investments.filter(inv => Number(inv.shares) > 0 && Number(inv.avgCost) > 0 && Number(inv.currentPrice) > 0);
-            const totalInvestmentValue = validInvestments.length
-                ? validInvestments.reduce((acc, inv) => acc + (Number(inv.shares) * Number(inv.currentPrice)), 0)
-                : Number(p.current_investments || 0);
-            const activeInvestmentCost = validInvestments.reduce((acc, inv) => acc + (Number(inv.shares) * Number(inv.avgCost)), 0);
-            
-            let currentCash, availableBalance, netWorth;
-            
-            currentCash = txIncome - txExpenses - activeInvestmentCost;
-            availableBalance = isCashFlow ? (current_savings + currentCash) : (currentCash + current_savings + totalInvestmentValue);
-            netWorth = currentCash + current_savings + totalInvestmentValue;
+            // Portfolio Math
+            const activeAssets = invs.filter(inv => Number(inv.shares) > 0 && Number(inv.avgCost) > 0 && Number(inv.currentPrice) > 0);
+            const activeInvestmentCost = activeAssets.reduce((acc, inv) => acc + (Number(inv.shares) * Number(inv.avgCost)), 0);
+            const unrealizedValue = activeAssets.reduce((acc, inv) => acc + (Number(inv.shares) * Number(inv.currentPrice)), 0);
+            const unrealizedProfit = unrealizedValue - activeInvestmentCost;
+
+            const totalReturned = txs.filter(t => t.category === 'Investment Returns' && t.type === 'income').reduce((acc, t) => acc + Number(t.amount || 0), 0);
+            const realizedCost = txs.filter(t => t.category === 'Investment Cost Basis' && t.type === 'expense').reduce((acc, t) => acc + Number(t.amount || 0), 0);
+            const realizedProfit = totalReturned - realizedCost;
+            const netProfitLoss = realizedProfit + unrealizedProfit;
+
+            const totalInvestmentValue = unrealizedValue;
+            const totalInvestmentCost = activeInvestmentCost;
+            const investmentProfit = unrealizedProfit;
+
+            // Balance & Net Worth Math
+            const currentCash = txIncome - txExpenses - activeInvestmentCost;
+            const availableBalance = isCashFlow ? (current_savings + currentCash) : (currentCash + current_savings + totalInvestmentValue);
+            const netWorth = currentCash + current_savings + totalInvestmentValue;
+
             const now = new Date();
             const thisYM  = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
             const lastDate = new Date(now.getFullYear(), now.getMonth()-1, 1);
             const lastYM  = `${lastDate.getFullYear()}-${String(lastDate.getMonth()+1).padStart(2,'0')}`;
-            const txThisMonth = this.state.transactions.filter(t => t.date.startsWith(thisYM));
-            const txLastMonth = this.state.transactions.filter(t => t.date.startsWith(lastYM));
+            const txThisMonth = txs.filter(t => t.date.startsWith(thisYM));
+            const txLastMonth = txs.filter(t => t.date.startsWith(lastYM));
             const netThisMonth = txThisMonth.reduce((s,t) => s + (t.type==='income' ? t.amount : -t.amount), 0);
             const netLastMonth = txLastMonth.reduce((s,t) => s + (t.type==='income' ? t.amount : -t.amount), 0);
             let netWorthGrowth = 0;
@@ -532,17 +540,13 @@ const App = {
             } else if (netThisMonth > 0) {
                 netWorthGrowth = 100;
             }
-            const totalInvestmentCost = validInvestments.length
-                ? validInvestments.reduce((acc, curr) => acc + (curr.shares * curr.avgCost), 0)
-                : totalInvestmentValue * 0.85;
-            const investmentProfit = totalInvestmentValue - totalInvestmentCost;
-            const budgetProgress = this.state.budgets.map(budget => {
-                const spent = this.state.transactions
-                    .filter(t => t.type === 'expense' && t.category === budget.category)
-                    .reduce((acc, curr) => acc + curr.amount, 0);
+
+            const budgetProgress = budgets.map(budget => {
+                const spent = txs.filter(t => t.type === 'expense' && t.category === budget.category).reduce((acc, curr) => acc + curr.amount, 0);
                 return { ...budget, spent };
             });
-            let healthScore, breakdown;
+
+            let healthScore = 0, breakdown = {};
             if (isCashFlow) {
                 let spendingScore = 15;
                 if (txIncome > 0) {
@@ -553,24 +557,16 @@ const App = {
                     ? (budgetProgress.filter(b => b.spent <= b.limit).length / budgetProgress.length) * 20
                     : 10;
                 let goalScore = 10;
-                if (this.state.savings.length > 0) {
-                    const avgProgress = this.state.savings.reduce((sum, g) => 
-                        sum + Math.min(100, g.target > 0 ? (g.current / g.target) * 100 : 0), 0) / this.state.savings.length;
+                if (savings.length > 0) {
+                    const avgProgress = savings.reduce((sum, g) => sum + Math.min(100, g.target > 0 ? (g.current / g.target) * 100 : 0), 0) / savings.length;
                     goalScore = (avgProgress / 100) * 25;
                 }
                 const trendScore = currentCash > 0 ? 15 : currentCash > -1000 ? 8 : 3;
-                const txCount = this.state.transactions.length;
-                const consistencyScore = Math.min(10, txCount / 5);
+                const consistencyScore = Math.min(10, txs.length / 5);
                 healthScore = Math.round(spendingScore + budgetScore + goalScore + trendScore + consistencyScore);
-                breakdown = {
-                    spendingScore: Math.round(spendingScore),
-                    budgetScore: Math.round(budgetScore),
-                    goalScore: Math.round(goalScore),
-                    trendScore: Math.round(trendScore),
-                    consistencyScore: Math.round(consistencyScore)
-                };
+                breakdown = { spendingScore: Math.round(spendingScore), budgetScore: Math.round(budgetScore), goalScore: Math.round(goalScore), trendScore: Math.round(trendScore), consistencyScore: Math.round(consistencyScore) };
             } else {
-                const monthlyIncomeLocal = monthly_income || (txIncome / Math.max(1, this.state.transactions.length));
+                const monthlyIncomeLocal = monthly_income || (txIncome / Math.max(1, txs.length));
                 const savingsRate = current_savings / (monthlyIncomeLocal * 12 || 1);
                 const savingsRateScore = Math.min(20, savingsRate * 100);
                 const emergencyMonths = current_savings / (monthly_expenses || totalExpenses || 1);
@@ -579,15 +575,14 @@ const App = {
                     ? (budgetProgress.filter(b => b.spent <= b.limit).length / budgetProgress.length) * 15
                     : 10;
                 let goalScore = 5;
-                if (this.state.savings.length > 0) {
-                    const avgProgress = this.state.savings.reduce((sum, g) => 
-                        sum + Math.min(100, g.target > 0 ? (g.current / g.target) * 100 : 0), 0) / this.state.savings.length;
+                if (savings.length > 0) {
+                    const avgProgress = savings.reduce((sum, g) => sum + Math.min(100, g.target > 0 ? (g.current / g.target) * 100 : 0), 0) / savings.length;
                     goalScore = (avgProgress / 100) * 15;
                 }
                 const invRatio = current_savings > 0 ? (totalInvestmentValue / current_savings) : (totalInvestmentValue > 0 ? 1 : 0);
                 const investmentScore = Math.min(15, invRatio * 15);
                 const monthlyExp = {};
-                this.state.transactions.filter(t => t.type === 'expense').forEach(t => {
+                txs.filter(t => t.type === 'expense').forEach(t => {
                     const ym = t.date.substring(0, 7);
                     monthlyExp[ym] = (monthlyExp[ym] || 0) + t.amount;
                 });
@@ -596,25 +591,18 @@ const App = {
                     const expValues = Object.values(monthlyExp);
                     const avgExp = expValues.reduce((a, b) => a + b, 0) / expValues.length;
                     const variance = expValues.reduce((sum, val) => sum + Math.pow(val - avgExp, 2), 0) / expValues.length;
-                    const stdDev = Math.sqrt(variance);
-                    const cv = avgExp > 0 ? stdDev / avgExp : 1;
+                    const cv = avgExp > 0 ? Math.sqrt(variance) / avgExp : 1;
                     stabilityScore = Math.max(0, 10 * (1 - Math.min(1, cv)));
                 }
                 const growthScore = netWorth > 0 ? 5 : 2;
                 healthScore = Math.round(savingsRateScore + emergencyFundScore + budgetScore + goalScore + investmentScore + stabilityScore + growthScore);
-                breakdown = {
-                    savingsRateScore: Math.round(savingsRateScore),
-                    emergencyFundScore: Math.round(emergencyFundScore),
-                    budgetScore: Math.round(budgetScore),
-                    goalScore: Math.round(goalScore),
-                    investmentScore: Math.round(investmentScore),
-                    stabilityScore: Math.round(stabilityScore),
-                    growthScore: Math.round(growthScore)
-                };
+                breakdown = { savingsRateScore: Math.round(savingsRateScore), emergencyFundScore: Math.round(emergencyFundScore), budgetScore: Math.round(budgetScore), goalScore: Math.round(goalScore), investmentScore: Math.round(investmentScore), stabilityScore: Math.round(stabilityScore), growthScore: Math.round(growthScore) };
             }
+
             return {
                 totalIncome, totalExpenses, currentCash, current_savings, monthly_income, monthly_expenses,
                 totalInvestmentValue, totalInvestmentCost, investmentProfit,
+                totalReturned, realizedCost, realizedProfit, netProfitLoss,
                 netWorth, availableBalance, netWorthGrowth, budgetProgress, healthScore,
                 breakdown, isCashFlow
             };
@@ -2008,7 +1996,7 @@ const App = {
             }
             
             // Create income transaction for sale proceeds
-            const txRes = await fetch('/api/transactions', {
+            const txIncomeRes = await fetch('/api/transactions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -2019,11 +2007,26 @@ const App = {
                     date: sellDate
                 })
             });
-            if (!txRes.ok) throw new Error('Failed to create transaction');
+            if (!txIncomeRes.ok) throw new Error('Failed to create income transaction');
+            
+            // Create expense transaction for original cost basis
+            const txExpenseRes = await fetch('/api/transactions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    description: `Original cost basis for ${sellQuantity} ${inv.symbol} @ ${this.getCurrencySymbol()}${this.formatNumber(inv.avgCost)}`,
+                    amount: totalCost,
+                    category: 'Investment Cost Basis',
+                    type: 'expense',
+                    date: sellDate
+                })
+            });
+            if (!txExpenseRes.ok) throw new Error('Failed to create cost basis transaction');
             
             Toast.show(`Sold ${sellQuantity} ${inv.symbol} - Realized ${profit >= 0 ? 'Gain' : 'Loss'}: ${this.getCurrencySymbol()}${this.formatNumber(Math.abs(profit))} (${profitPct}%)`, 'success');
             await this.fetchInvestments();
             await this.fetchTransactions();
+            await DataSync.fullSync();
         } catch (err) {
             Toast.show('Error: ' + err.message, 'error');
         }

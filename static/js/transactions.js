@@ -290,10 +290,9 @@ const AppViews = {
         `;
     },
     getInvestmentsHTML() {
-        const activeAssets = this.state.investments.filter(inv => inv.shares > 0).sort((a, b) => b.id - a.id);
-        const totalInvested = this.state.investments.reduce((sum, inv) => sum + (inv.shares * inv.avgCost), 0);
-        const totalReturned = this.state.investments.filter(inv => inv.shares === 0).reduce((sum, inv) => sum + (inv.shares * inv.currentPrice - inv.shares * inv.avgCost), 0);
-        const sortedTransactions = [...this.state.transactions].filter(t => t.category === 'Investment Returns').sort((a, b) => new Date(b.date) - new Date(a.date));
+        const calc = this.getCalculations();
+        const activeAssets = this.state.investments.filter(inv => Number(inv.shares) > 0).sort((a, b) => b.id - a.id);
+        const sortedTransactions = [...this.state.transactions].filter(t => t.category === 'Investment Returns' || t.category === 'Investment Cost Basis').sort((a, b) => new Date(b.date) - new Date(a.date));
         
         return `
             <div class="space-y-6 slide-up pb-10">
@@ -315,16 +314,16 @@ const AppViews = {
                 <!-- Summary Cards -->
                 <div class="grid grid-cols-3 gap-4">
                     <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700">
-                        <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold mb-1">Total Invested</p>
-                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white dark:text-white">${this.formatCurrency(totalInvested)}</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold mb-1">Active Cost</p>
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white dark:text-white">${this.formatCurrency(calc.totalInvestmentCost)}</h3>
                     </div>
                     <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700">
                         <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold mb-1">Total Returned</p>
-                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white dark:text-white">${this.formatCurrency(totalReturned)}</h3>
+                        <h3 class="text-2xl font-bold text-slate-900 dark:text-white dark:text-white">${this.formatCurrency(calc.totalReturned)}</h3>
                     </div>
                     <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700">
                         <p class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold mb-1">Net Profit/Loss</p>
-                        <h3 class="text-2xl font-bold ${(totalReturned - totalInvested) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">${(totalReturned - totalInvested) >= 0 ? '+' : ''}${this.formatCurrency(totalReturned - totalInvested)}</h3>
+                        <h3 class="text-2xl font-bold ${calc.netProfitLoss >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}">${calc.netProfitLoss >= 0 ? '+' : ''}${this.formatCurrency(calc.netProfitLoss)}</h3>
                     </div>
                 </div>
                 
