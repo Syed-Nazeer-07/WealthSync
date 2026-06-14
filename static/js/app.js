@@ -505,7 +505,7 @@ const App = {
         let currentCash, availableBalance, netWorth;
         
         currentCash = txIncome - txExpenses - activeInvestmentCost;
-        availableBalance = isCashFlow ? currentCash : (currentCash + totalSavings + totalInvestmentValue);
+        availableBalance = isCashFlow ? (totalSavings + currentCash) : (currentCash + totalSavings + totalInvestmentValue);
         netWorth = currentCash + totalSavings + totalInvestmentValue;
         const now = new Date();
         const thisYM  = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;

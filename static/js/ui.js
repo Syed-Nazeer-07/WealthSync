@@ -45,9 +45,9 @@ const Toast = (() => {
 const ConfirmModal = (() => {
     function show({ title, message, confirmLabel = 'Confirm', onConfirm }) {
         const overlay = document.createElement('div');
-        overlay.className = 'fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm fade-in';
+        overlay.className = 'fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm';
         overlay.innerHTML = `
-            <div class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-800 w-full max-w-sm slide-up overflow-hidden">
+            <div class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl border border-slate-100 dark:border-slate-800 w-full max-w-sm overflow-hidden">
                 <div class="px-8 pt-8 pb-6 text-center">
                     <div class="w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-500/10 flex items-center justify-center mx-auto mb-4">
                         <i data-lucide="trash-2" class="w-6 h-6 text-rose-500"></i>
