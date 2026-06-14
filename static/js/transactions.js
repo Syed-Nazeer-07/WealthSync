@@ -61,7 +61,10 @@ const AppViews = {
             filtered = filtered.filter(tx => tx.category === this.state.txFilterCategory);
         }
         // Sort by date, latest first
-        filtered = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+        filtered = filtered.sort((a, b) => {
+            if (a.date !== b.date) return new Date(b.date) - new Date(a.date);
+            return b.id - a.id;
+        });
         if (filtered.length === 0) {
             return `<tr><td colspan="6" class="py-16 text-center">
                 <div class="flex flex-col items-center gap-3 text-slate-500 dark:text-slate-400">
@@ -292,7 +295,10 @@ const AppViews = {
     getInvestmentsHTML() {
         const calc = this.getCalculations();
         const activeAssets = this.state.investments.filter(inv => Number(inv.shares) > 0).sort((a, b) => b.id - a.id);
-        const sortedTransactions = [...this.state.transactions].filter(t => t.category === 'Investment Returns' || t.category === 'Investment Cost Basis').sort((a, b) => new Date(b.date) - new Date(a.date));
+        const sortedTransactions = [...this.state.transactions].filter(t => t.category === 'Investment Returns' || t.category === 'Investment Cost Basis').sort((a, b) => {
+            if (a.date !== b.date) return new Date(b.date) - new Date(a.date);
+            return b.id - a.id;
+        });
         
         return `
             <div class="space-y-6 slide-up pb-10">

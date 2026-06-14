@@ -506,25 +506,74 @@ const App = {
             const totalIncome = Number(txIncome || monthly_income) || 0;
             const totalExpenses = Number(txExpenses || monthly_expenses) || 0;
 
-            // Portfolio Math
-            const activeAssets = invs.filter(inv => Number(inv.shares) > 0 && Number(inv.avgCost) > 0 && Number(inv.currentPrice) > 0);
-            const activeInvestmentCost = activeAssets.reduce((acc, inv) => acc + (Number(inv.shares) * Number(inv.avgCost)), 0);
-            const unrealizedValue = activeAssets.reduce((acc, inv) => acc + (Number(inv.shares) * Number(inv.currentPrice)), 0);
-            const unrealizedProfit = unrealizedValue - activeInvestmentCost;
+    getPortfolioSummary() {
+        const invs = Array.isArray(this.state.investments) ? this.state.investments : [];
+        const txs = Array.isArray(this.state.transactions) ? this.state.transactions : [];
 
-            const totalReturned = txs.filter(t => t.category === 'Investment Returns' && t.type === 'income').reduce((acc, t) => acc + Number(t.amount || 0), 0);
-            const realizedCost = txs.filter(t => t.category === 'Investment Cost Basis' && t.type === 'expense').reduce((acc, t) => acc + Number(t.amount || 0), 0);
-            const realizedProfit = totalReturned - realizedCost;
-            const netProfitLoss = realizedProfit + unrealizedProfit;
+        // Portfolio Math
+        const activeAssets = invs.filter(inv => Number(inv.shares) > 0);
+        
+        const activeInvestmentCost = activeAssets.reduce((acc, inv) => acc + (Number(inv.shares) * Number(inv.avgCost || 0)), 0);
+        const unrealizedValue = activeAssets.reduce((acc, inv) => acc + (Number(inv.shares) * Number(inv.currentPrice || 0)), 0);
+        const unrealizedProfit = unrealizedValue - activeInvestmentCost;
 
-            const totalInvestmentValue = unrealizedValue;
-            const totalInvestmentCost = activeInvestmentCost;
-            const investmentProfit = unrealizedProfit;
+        const totalReturned = txs.filter(t => t.category === 'Investment Returns' && t.type === 'income').reduce((acc, t) => acc + Number(t.amount || 0), 0);
+        const realizedCost = txs.filter(t => t.category === 'Investment Cost Basis' && t.type === 'expense').reduce((acc, t) => acc + Number(t.amount || 0), 0);
+        const realizedProfit = totalReturned - realizedCost;
+        const netProfitLoss = realizedProfit + unrealizedProfit;
+
+        // Validation
+        const strictCost = activeAssets.reduce((sum, inv) => sum + (Number(inv.shares) * Number(inv.avgCost || 0)), 0);
+        if (Math.abs(activeInvestmentCost - strictCost) > 0.01) {
+            console.error('Portfolio Validation Error: activeCost mismatch');
+        }
+
+        return {
+            activeAssets,
+            activeInvestmentCost,
+            unrealizedValue,
+            unrealizedProfit,
+            totalReturned,
+            realizedCost,
+            realizedProfit,
+            netProfitLoss,
+            totalInvestmentValue: unrealizedValue,
+            totalInvestmentCost: activeInvestmentCost,
+            investmentProfit: unrealizedProfit
+        };
+    },
+    getCalculations() {
+        try {
+            const p = this.state.profile || {};
+            const isCashFlow = p.account_mode === 'cashflow';
+            
+            const current_savings  = Number(p.current_savings || 0) || 0;
+            const monthly_income   = Number(p.monthly_income || 0) || 0;
+            const monthly_expenses = Number(p.monthly_expenses || 0) || 0;
+            
+            const txs = Array.isArray(this.state.transactions) ? this.state.transactions : [];
+            const budgets = Array.isArray(this.state.budgets) ? this.state.budgets : [];
+            const savings = Array.isArray(this.state.savings) ? this.state.savings : [];
+
+            // Core Transaction Math
+            const txIncome = txs.filter(t => t.type === 'income').reduce((acc, t) => acc + Number(t.amount || 0), 0);
+            const txExpenses = txs.filter(t => t.type === 'expense').reduce((acc, t) => acc + Number(t.amount || 0), 0);
+            const totalIncome = Number(txIncome || monthly_income) || 0;
+            const totalExpenses = Number(txExpenses || monthly_expenses) || 0;
+
+            const portfolio = this.getPortfolioSummary();
+            const totalInvestmentCost = portfolio.activeInvestmentCost;
+            const investmentProfit = portfolio.unrealizedProfit;
+            const totalInvestmentValue = portfolio.unrealizedValue;
+            const totalReturned = portfolio.totalReturned;
+            const realizedCost = portfolio.realizedCost;
+            const realizedProfit = portfolio.realizedProfit;
+            const netProfitLoss = portfolio.netProfitLoss;
 
             // Balance & Net Worth Math
-            const currentCash = txIncome - txExpenses - activeInvestmentCost;
-            const availableBalance = isCashFlow ? (current_savings + currentCash) : (currentCash + current_savings + totalInvestmentValue);
-            const netWorth = currentCash + current_savings + totalInvestmentValue;
+            const currentCash = txIncome - txExpenses - portfolio.activeInvestmentCost;
+            const availableBalance = isCashFlow ? (current_savings + currentCash) : (currentCash + current_savings + portfolio.unrealizedValue);
+            const netWorth = currentCash + current_savings + portfolio.unrealizedValue;
 
             const now = new Date();
             const thisYM  = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
@@ -800,7 +849,10 @@ const App = {
         const yesterday = this._prevDay(today);
         const groups = { today: [], yesterday: [], earlier: [] };
         [...this.state.transactions]
-            .sort((a, b) => b.date.localeCompare(a.date))
+            .sort((a, b) => {
+                if (a.date !== b.date) return new Date(b.date) - new Date(a.date);
+                return b.id - a.id;
+            })
             .slice(0, 20)
             .forEach(tx => {
                 if (tx.date === today) groups.today.push(tx);
