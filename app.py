@@ -112,6 +112,12 @@ class User(db.Model):
 
     profile      = db.relationship("Profile",     back_populates="user", uselist=False, cascade="all, delete-orphan")
     transactions = db.relationship("Transaction", back_populates="user", cascade="all, delete-orphan")
+    budgets       = db.relationship("Budget",       back_populates="user", cascade="all, delete-orphan")
+    goals         = db.relationship("Goal",         back_populates="user", cascade="all, delete-orphan")
+    investments   = db.relationship("Investment",   back_populates="user", cascade="all, delete-orphan")
+    roadmap_items = db.relationship("RoadmapItem",  back_populates="user", cascade="all, delete-orphan")
+    settings      = db.relationship("UserSettings", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    categories    = db.relationship("Category",     back_populates="user", cascade="all, delete-orphan")
 
 
 class Profile(db.Model):
@@ -148,6 +154,8 @@ class Budget(db.Model):
     limit_amount = db.Column(db.Float, nullable=False)
     created_at   = db.Column(db.DateTime, default=datetime.utcnow)
 
+    user = db.relationship("User", back_populates="budgets")
+
 
 class Goal(db.Model):
     id             = db.Column(db.Integer, primary_key=True)
@@ -158,6 +166,8 @@ class Goal(db.Model):
     monthly_contribution = db.Column(db.Float, default=0)
     target_date    = db.Column(db.String(10), nullable=True)
     created_at     = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship("User", back_populates="goals")
 
 
 class Investment(db.Model):
@@ -170,6 +180,8 @@ class Investment(db.Model):
     current_value = db.Column(db.Float, nullable=False)
     created_at    = db.Column(db.DateTime, default=datetime.utcnow)
 
+    user = db.relationship("User", back_populates="investments")
+
 
 class RoadmapItem(db.Model):
     __tablename__ = "roadmap_item"
@@ -179,6 +191,8 @@ class RoadmapItem(db.Model):
     icon     = db.Column(db.String(50), nullable=False, default="target")
     status   = db.Column(db.String(20), nullable=False, default="pending")
     position = db.Column(db.Integer, nullable=False, default=0)
+
+    user = db.relationship("User", back_populates="roadmap_items")
 
 
 class UserSettings(db.Model):
@@ -193,7 +207,7 @@ class UserSettings(db.Model):
     sidebar_collapsed     = db.Column(db.Boolean,     default=False)
     timezone              = db.Column(db.String(50),  default="UTC")
 
-    user = db.relationship("User", backref=db.backref("settings", uselist=False))
+    user = db.relationship("User", back_populates="settings")
 
 
 class Category(db.Model):
@@ -208,6 +222,8 @@ class Category(db.Model):
     created_at  = db.Column(db.DateTime, default=datetime.utcnow)
 
     __table_args__ = (db.UniqueConstraint('user_id', 'name', 'category_type', name='_user_category_uc'),)
+
+    user = db.relationship("User", back_populates="categories")
 
 
 
